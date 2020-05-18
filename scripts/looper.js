@@ -339,12 +339,12 @@ function toggleRecord(trackNumber)
   if(track.isRecording)
   {
     // document.getElementById("recordButton"+trackNumber).style.backgroundColor = "red";
-    document.getElementById("recordButton"+trackNumber).src = "trackButtonRecording.png";
+    document.getElementById("recordButton"+trackNumber).src = "images/trackButtonRecording.png";
 
   }
   else if(!track.isRecording)
   {
-    document.getElementById("recordButton"+trackNumber).src = "trackButtonPlaying.png";
+    document.getElementById("recordButton"+trackNumber).src = "images/trackButtonPlaying.png";
     // document.getElementById("recordButton"+trackNumber).style.backgroundColor = "black";
     // playLastLoop();
     // recordedTap = 0;
@@ -378,7 +378,7 @@ function cycleTrackButton(trackNumber) //or update track state?
       track.togglePlaying();
       startTrackLoop();
       // console.log("start playing");
-      document.getElementById("recordButton"+trackNumber).src = "trackButtonPlaying.png";
+      document.getElementById("recordButton"+trackNumber).src = "images/trackButtonPlaying.png";
     }
   }
   else if(track.isRecording)//if recording stop recording (playing)
@@ -398,7 +398,7 @@ function cycleTrackButton(trackNumber) //or update track state?
     track.togglePlaying();
     // console.log("stop playing");
     clearInterval(trackLoopTimer);
-    document.getElementById("recordButton"+trackNumber).src = "trackButtonPaused.png";
+    document.getElementById("recordButton"+trackNumber).src = "images/trackButtonPaused.png";
     if(showingIntro)
     {
       helpText.innerHTML = "Press trash </br>can to delete";
@@ -414,7 +414,7 @@ function clearTrack(trackNumber)
   //if only last playing track
   clearInterval(trackLoopTimer);
   track.isPlaying = false;
-  document.getElementById("recordButton"+trackNumber).src = "trackButtonEmpty.png"
+  document.getElementById("recordButton"+trackNumber).src = "images/trackButtonEmpty.png"
   if(showingIntro)
   {
     helpText.innerHTML = "Press to start</br> new loop";

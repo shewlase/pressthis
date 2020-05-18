@@ -163,12 +163,18 @@ function init()
 	loopTimers = [];
   initS1Loops();
 
-
+	setStage(stage);
 
 	// initStageTwo();
 	loadImages();
 	createDrumHotkeys();
 	setTimeout(createKeyboardHotkeys, 1000);
+
+}
+
+function setStage(stageId)
+{
+	stage = stageId;
 	if(stage == INTRO)
 	{
 		initStageOne();
@@ -183,7 +189,6 @@ function init()
 		// initThreeShow();
 	}
 }
-
 
 function initQuick()
 {
@@ -543,7 +548,7 @@ function initStageOne()
 	snare.style.opacity = "0";
 	kick.style.opacity = "0";
 	helpText.style.opacity = "1";
-	
+
 	multipleGuide.style.display = 'none';
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
@@ -1977,15 +1982,15 @@ document.onkeydown = function(evt) {
 		case 49: //1
 		// allTracks[1].clear();
 		// allTracks[1].togglePlaying();
-		initStudio();
+		setStage(STUDIO);
 			break;
 		case 50: //2
 		// allTracks[2].togglePlaying();
-		initStageOne();
+		setStage(QUICK);
 			break;
 		case 51: //3
 		// allTracks[3].togglePlaying();
-		initQuick();
+		setStage(INTRO);
 			break;
 		case 52: //4
 		// toggleMetronome();
