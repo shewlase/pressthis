@@ -1,0 +1,160 @@
+<html>
+
+	<head>
+		<title>Press This!</title>
+		<link rel="stylesheet" href="pressCss.css">
+		<link href='https://fonts.googleapis.com/css?family=Righteous' rel='stylesheet' type='text/css'>
+	</head>
+
+	<body oncontextmenu="return false;">
+		<div id="game">
+			<h1 id="helpText" class="animated">Press this!</h1>
+			<img id='cursorImage' src='images/cursor.png'>
+
+			<div id="drumDiv" class="animated">
+				<img id="hat" class="animated drum" src="images/cymbal.png" alt = "w" onmousedown = "tap('hat');">
+
+				<img id="snare" class="animated drum" src="images/snare.png" alt = "s" onmousedown = "tap('snare');">
+
+				<img id="kick" class="animated drum" src="images/kick.png" alt = "a" onmousedown = "tap('kick');">
+			</div>
+
+			<div id="keyboardDiv" class="animated">
+				<img id='keyboardMain' draggable='false' src='images/keyboardMain.png'>
+			</div>
+
+			<div id="guitarDiv" onmousedown='guitarClicked(event)'>
+				<img id="guitarMain" src="images/guitar.png" >
+				<!-- should dynamically create them, could set dynamic string amount -->
+				<!-- <div id="sb0" class="betweenString" onmouseenter="checkStringTap(event)"></div> -->
+				<div id="sb1" class="betweenString" onmouseenter="checkStringTap(event)"></div>
+				<div id="sb2" class="betweenString" onmouseenter="checkStringTap(event)"></div>
+				<div id="sb3"class="betweenString" onmouseenter="checkStringTap(event)"></div>
+				<div id="sb4"class="betweenString" onmouseenter="checkStringTap(event)"></div>
+				<!-- <div id="string1" draggable="false" onmouseenter='stringTap(1)'></div>
+				<div id="string2" draggable="false" onmouseenter='stringTap(2)'></div>
+				<div id="string3" draggable="false"  onmouseenter='stringTap(3)'></div>
+				<div id="string4" draggable="false" onmouseenter='stringTap(4)'></div> -->
+				<img id="fretHand" draggable='false' src="images/fretUp.png">
+			</div>
+
+			<div id="studioDiv">
+				<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
+				<div id="hotkeyToggle" class="toggle toggleDisabled" onmousedown="togglePressed('hotkeys', event)"><p>Hotkeys</p></div>
+				<!-- <div id="recordButton1" onmousedown='toggleRecord(1)'></div> -->
+				<img id="recordButton1" src='images/trackButtonRecording.png' onmousedown='cycleTrackButton(1)'>
+				<!-- Need trash class, should dynamic create all -->
+				<img id="trashTrack1" src='images/trashIcon.png' onmousedown='clearTrack(1)'>
+				<input type="text" id="tempoInput">
+				<!-- <img id="recordButton1" src='trackButtonRecording.png' onmousedown='toggleRecord(1)'> -->
+
+			</div>
+			<div id="fullWhite"></div>
+			<img id="tempoButton" class="animate1s" src="images/tempoButton.png" onmousedown='tempoTap()'>
+			<div id="studioTrain" onmousedown='toggleStudio()'><p>Studio Training</p></div>
+			<div id='progressBar'></div>
+			<h1 id='songTitle'>Title<h1>
+			<h1 id='multipleGuide'>x3<h1>
+		</div>
+	</body>
+<!-- Sounds -->
+<div>
+	<audio id = "kickAudio">
+		<!-- <source src="sounds/http://upload.wikimedia.org/wikipedia/en/4/45/ACDC_-_Back_In_Black-sample.ogg" type="audio/ogg">  -->
+		<source src="sounds/kick.ogg" type="audio/ogg">
+		<source src="sounds/kick.mp3" type="audio/mpeg"> <!-- doesnt exist -->
+	</audio>
+	<audio id = "hatAudio">
+		<source src="sounds/hat.ogg" type="audio/ogg">
+		<source src="sounds/hat.mp3" type="audio/mpeg"> <!--doesnt exist-->
+	</audio>
+	<audio id = "snareAudio">
+		<source src="sounds/snare.ogg" type="audio/ogg">
+		<source src="sounds/snare.mp3" type="audio/mpeg"> <!--doesnt exist-->
+	</audio>
+	<audio id = "p1Audio">
+		<source src="sounds/p1.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p2Audio">
+		<source src="sounds/p2.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p3Audio">
+		<source src="sounds/p3.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p4Audio">
+		<source src="sounds/p4.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p5Audio">
+		<source src="sounds/p5.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p6Audio">
+		<source src="sounds/p6.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "p7Audio">
+		<source src="sounds/p7.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "pb1Audio">
+		<source src="sounds/pb1.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "pb2Audio">
+		<source src="sounds/pb2.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "pb4Audio">
+		<source src="sounds/pb3.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "pb5Audio">
+		<source src="sounds/pb4.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "pb6Audio">
+		<source src="sounds/pb5.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "metronomeAudio">
+		<source src="sounds/tap.ogg" type="audio/ogg">
+	</audio>
+
+
+	<audio id = "g20Audio">
+		<source src="sounds/g20.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g30Audio">
+		<source src="sounds/g30.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g40Audio">
+		<source src="sounds/g40.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g25Audio">
+		<source src="sounds/g25.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g27Audio">
+		<source src="sounds/g27.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g29Audio">
+		<source src="sounds/g29.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g35Audio">
+		<source src="sounds/g35.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g37Audio">
+		<source src="sounds/g37.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g39Audio">
+		<source src="sounds/g39.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g44Audio">
+		<source src="sounds/g44.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g46Audio">
+		<source src="sounds/g46.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g47Audio">
+		<source src="sounds/g47.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g48Audio">
+		<source src="sounds/g48.ogg" type="audio/ogg">
+	</audio>
+</div>
+
+<script type="text/javascript" src="scripts/looper.js"></script>
+<script type="text/javascript" src="scripts/pressThis.js"></script>
+<script type="text/javascript" src="scripts/audioApi.js"></script>
+</html>

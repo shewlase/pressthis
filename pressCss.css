@@ -1,0 +1,437 @@
+body{
+ margin: 0;
+ overflow: hidden;
+ cursor: none;
+}
+img{
+	position: absolute;
+	width: 25%;
+  user-select: none;
+	/* pointer-events: none; */
+}
+h1
+{
+	font-family: 'Righteous', cursive;
+	position: absolute;
+	color: black;
+  margin: 0 auto;
+}
+
+p
+{
+  	font-family: 'Righteous', cursive;
+    margin: 0;
+}
+
+#game
+{
+  width: 100vw;
+  height: 100vh;
+  position:absolute;
+}
+
+#recordButton1, #recordButton2, #recordButton3
+{
+  position: absolute;
+
+  bottom: 10vh;
+  /* background-color: red; */
+  width: 10vw;
+  /* height: 10vw; */
+}
+
+#tempoButton
+{
+  position: absolute;
+  width: 10vw;
+  right: 45vw;
+  bottom: 40vh;
+  z-index: 5;
+  display: none;
+}
+
+#tempoInput
+{
+  position: absolute;
+  /* width: 10vw; */
+  bottom: 3vh;
+  right: 10vw;
+}
+
+#recordButton1
+{
+  left: 46vw;
+}
+
+#trashTrack1
+{
+  position:absolute;
+  left: 40vw;
+  width: 5vw;
+  bottom: 10vh;
+}
+
+#recordButton2
+{
+  left: 46vw;
+}
+
+#recordButton3
+{
+  left: 66vw;
+}
+
+#studioTrain
+{
+  /* width: 5vw; */
+  padding: 1vw;
+  position: absolute;
+  left: 45vw;
+  top: 65vh;
+  border-bottom: 0.5vw solid darkgreen;
+  background-color: green;
+  display: none;
+}
+
+.drum
+{
+	position: absolute;
+}
+
+
+#drumDiv
+{
+	width: 100vw;
+	height: 100vh;
+	left: 12vw;
+	top: 6vw;
+	position: relative;
+	transition: all 2s ease 0s;
+	z-index: 2;
+	/* background-color: gray; */
+}
+
+#hat{
+	left: 32%;
+	top: 10%;
+	width: 18%;
+	/* height: 8vw;
+	width: auto; */
+	/* background-image: url("squareFaceHit.jpg"); */
+}
+
+#snare{
+	left: 45%;
+	top: 35%;
+	width: 18%;
+	opacity: 0;
+	/* background-image: url("circleFaceHit.jpg"); */
+}
+
+#kick{
+	left: 12%;
+	top: 38%;
+	width: 28%;
+	opacity: 0;
+	/* background-image: url("triangleFaceHit.jpg"); */
+}
+
+#keyboardDiv
+{
+	left: 28vw;
+	top: 100vw;
+	position: absolute;
+	width: 60vw;
+	transition: all 2s ease 0s;
+	z-index: 2;
+}
+
+#keyboardMain
+{
+	position:relative;
+	width: 100%;
+	top: 0px;
+}
+
+.whiteKey, .whiteKeyBg
+{
+	position:absolute;
+	width: 10%;
+}
+
+.blackKey, .blackKeyBg
+{
+	position:absolute;
+	width: 8%;
+}
+
+.blackKey
+{
+/* left: 16%; */
+top: 35%;
+	transition: all 0.05s ease 0s;
+}
+
+.blackKeyBg
+{
+	top: 39%;
+	height: auto;
+}
+
+.whiteKeyBg
+{
+	top: 44%;
+}
+
+.whiteKey
+{
+	top: 40%;
+	transition: all 0.05s ease 0s;
+}
+
+#cursorImage
+{
+	position: absolute;
+	width: 10vw;
+	z-index: 6;
+	transform-origin: 15% 0%;
+	/* transform: rotate(-10deg); */
+	pointer-events: none;
+	left: 50vw;
+	top: 50vh;
+	transition: width 2s ease;
+}
+/* #white
+{
+	top: 40%;
+} */
+
+#u{
+	opacity: 0;
+	display: none;
+	left: 10%;
+	top: 30%;
+	height: 20vw;
+	width: auto;
+}
+
+#i{
+	opacity: 0;
+	display: none;
+	left: 35%;
+	top: 30%;
+	height: 20vw;
+	width: auto;
+}
+#o{
+	opacity: 0;
+	display: none;
+	left: 55%;
+	top: 30%;
+	height: 20vw;
+	width: auto;
+}
+#p{
+	opacity: 0;
+	display: none;
+	left: 80%;
+	top: 30%;
+	height: 20vw;
+	width: auto;
+}
+
+#helpText{
+	top: 21vw;
+	/* width: 35vw; */
+	/* left: 32vw; */
+	font-weight: normal;
+	font-size: 4vw;
+	/* transform: rotate(-15deg); */
+	z-index: 5;
+	pointer-events: none;
+}
+
+#guitarDiv
+{
+  position: absolute;
+  display: none;
+  top: 40vh;
+  left: 10vw;
+  width: 80vw;
+  height: 26vw;
+  z-index: 5;
+  /* background-color: gray; */
+}
+
+#guitarMain
+{
+  width: 100%;
+  position: relative:
+  top:0;
+}
+
+#fretHand
+{
+  position: absolute;
+  left: 21.25%;
+  width: 17%;
+  top: 18%;
+  transition: left 0.1s ease;
+}
+
+#fullWhite
+{
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  top:0;
+  z-index: 4;
+  display: none;
+  /* opacity: 0; */
+  transition: opacity 1s ease;
+}
+
+#studioDiv
+{
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  display: flex;
+  z-index: 1;
+}
+
+#progressBar
+{
+  width: 0vw;
+  border-right: solid gray 100vw;
+  position:absolute;
+  height: 4vw;
+  bottom: 0;
+  background-color: green;
+}
+
+#songTitle
+{
+  position: absolute;
+  font-size: 3vw;
+  width: 100%;
+  text-align: center;
+  top: 2vw;
+}
+
+#multipleGuide
+{
+  font-size: 4vw;
+  z-index: 5;
+}
+
+.betweenString
+{
+  border-top: 0.5vw solid gray;
+  position: relative;
+  width: 78%;
+  /* margin-top: 3%; */
+  height: 12%;
+  left: 20%;
+}
+
+.betweenString:first-of-type
+{
+  border: 0;
+  margin-top: 5%;
+}
+/* should be sb1 */
+/* #sb1
+{
+  margin-top: 4%;
+} */
+
+#string1, #string2, #string3, #string4
+{
+  position: relative;
+  width: 78%;
+  height: 3%;
+  left: 20%;
+  background-color: gray;
+  margin-top: 3%;
+}
+
+#string1
+{
+  /* margin-top: 10%; */
+  display: none;
+}
+
+#string2
+{
+  /* top: 15%; */
+  margin-top: 9%;
+}
+
+#string3
+{
+}
+
+#string4
+{
+}
+
+.hotkeyLetter
+{
+ position: absolute;
+ font-size: 2vw;
+ pointer-events: none;
+ user-select: none;
+ display: block;
+}
+
+.hidden
+{
+  display: none;
+}
+
+.toggle
+{
+  position: relative;
+  margin-top: 2vw;
+  padding: 1vw;
+  width:  5vw;
+  text-align: center;
+  /* position: relative; */
+  left: 90%;
+  margin-right: 0;
+	font-size: 1vw;
+}
+
+.toggle p
+{
+  pointer-events: none;
+}
+
+.toggleEnabled
+{
+  background-color: green;
+  border-top: 0.5vw solid rgba(255,255,255,1);
+}
+
+.toggleDisabled
+{
+  background-color: gray;
+  border-bottom: 0.5vw solid black;
+}
+
+.animate1s
+{
+	transition: all 1s ease 0s;
+}
+
+.animated
+{
+	-webkit-transition: all 0.5s ease 0s;
+	-moz-transition: all 0.5s ease 0s;
+	-o-transition: all 0.5s ease 0s;
+	-ms-transition: all 0.5s ease 0s;
+	transition: all 0.1s ease 0s;
+}
