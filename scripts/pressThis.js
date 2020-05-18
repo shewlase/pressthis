@@ -34,7 +34,7 @@ let stages = [STUDIO, INTRO, TWO, QUICK];
 let stage = INTRO;
 let quickMode = 'learn'; //play and learn
 let leftMouseDown = false;
-let multipleGuide;
+let multipleGuide, songTitle, progressBar;//could make it quickDiv
 //images not used initially but change with user events
 let animationImages = ["images/whiteKeyHighlighted.png", "images/blackKeyHighlighted.png",
 		"images/cursorDown.png", "images/fretUp.png", "images/fretE.png", "images/fretA.png", "images/trackButtonRecording.png",
@@ -56,6 +56,8 @@ var notesAndPhases =
 	['snare'],
 	['kick'],
 	['snare','snare','snare'],
+	['kick','hat','snare'],
+	['kick','hat','snare','hat','kick'],
 	['kick','hat','snare','hat','kick','hat','snare'],
 	['p3'],
 	['p3','p2','p1'],
@@ -149,6 +151,8 @@ function init()
 	tempoButton  = document.getElementById("tempoButton");
 	studioDiv =  document.getElementById("studioDiv");
 	multipleGuide = document.getElementById('multipleGuide');
+	songTitle = document.getElementById('songTitle');
+	progressBar = document.getElementById('progressBar');
 	// document.appendChild(multipleGuide);
 	// loadSounds();
 	buildKeyboard();
@@ -188,6 +192,9 @@ function initQuick()
 	// hat.style.display = "none";
 	// allRiffs = [firstRiff, secondRiff, thirdRiff, fourthRiff];
 
+	songTitle.style.display = 'block';
+	multipleGuide.style.display = 'block';
+	progressBar.style.display = 'block';
 	drumDiv.style.display = "none";
 	document.getElementById("recordButton1").style.display = 'none';
 	document.getElementById("trashTrack1").style.display = 'none';
@@ -427,7 +434,7 @@ function countAnyRepeatsLastThree(nextThree)
 function updateThreeKeys()
 {
 	//should only do this when songs change
-	document.querySelector('#songTitle').innerHTML = allRiffs[currentRifNumber].title;
+	songTitle.innerHTML = allRiffs[currentRifNumber].title;
 	// document.querySelector('#songTitle').innerHTML = allRiffs[currentRifNumber].name;
 	let nextRiff = allRiffs[currentRifNumber+1];
 	if(nextRiff == null) nextRiff = allRiffs[0];
@@ -504,6 +511,10 @@ function initStudio()
 {
 	snare.style.opacity = "1";
 	kick.style.opacity = "1";
+
+	multipleGuide.style.display = 'none';
+	songTitle.style.display = 'none';
+	progressBar.style.display = 'none';
 	// helpText.style.opacity = "0";
 	helpText.style.transform = "rotate(0deg)";
 	helpText.innerHTML = "Press 4x to </br> set speed";
@@ -532,6 +543,11 @@ function initStageOne()
 	snare.style.opacity = "0";
 	kick.style.opacity = "0";
 	helpText.style.opacity = "1";
+	
+	multipleGuide.style.display = 'none';
+	songTitle.style.display = 'none';
+	progressBar.style.display = 'none';
+
 	helpText.innerHTML = "Press this!";
 	helpText.style.top = "21vw";
 	helpText.style.left = "32vw";
@@ -876,12 +892,12 @@ function stage1Tap(soundName)
 			}, 1000);
 			phaseDelay = 2000;
 		}
-		else if(phaseNumber == 4  && passedCurrentPhase)//when drums correct
+		else if(phaseNumber == 6  && passedCurrentPhase)//when drums correct
 		{
 			initStageTwo();
 			phaseDelay = 10*beatTime;
 		}
-		else if(phaseNumber >= 5) //all piano phases
+		else if(phaseNumber >= 7) //all piano phases
 		{
 			let loopTime = beatTime*8;
 			let timeSinceLoopStart = new Date().getTime() - loopStartTime;
@@ -1037,8 +1053,8 @@ function initStageTwo()
 		snare.style.opacity = "1";
 		kick.style.opacity = "1";
 		// clickNumber = 13;
-		correctTaps = 13;
-		phaseNumber = 5;
+		correctTaps = 21;
+		phaseNumber = 7;
 		// playPhase(5, 8*beatTime);//first piano key
 		// loopFirstBeat();
 		setTimeout(function()
@@ -1050,7 +1066,7 @@ function initStageTwo()
 		// playPhase(4, 0);
 		if(testingLocal)
 		{
-			loopPhase(4, 0);
+			loopPhase(6, 0);
 		}
 		else
 		{
