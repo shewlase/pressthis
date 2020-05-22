@@ -8,6 +8,7 @@ const HAT = 1;
 const SNARE = 2;
 let contextInitiated = false;
 let stoppableSounds, activeSounds;
+// let activeSounds = {};
 
 //stores current playing sound for each string
 //     i.e. only one per string is possible
@@ -16,9 +17,10 @@ function initApi()
 {
 	context = new AudioContext();
 	contextInitiated = true;
-	allBuffers = [];
+	// allBuffers = [];
+	allBuffers = {};
 	stoppableSounds = [];
-	activeSounds = [];
+	activeSounds = {};
 	stringSources = [];
 	guitarBuffers = make2dArray(6);
 
@@ -48,34 +50,66 @@ function make2dArray(rows) {
 
   return arr;
 }
-
+//need allbuffer = {}; allBuffers[kick] = buffer;
 // var dogBarkingBuffer = null;
 function loadAllSounds()
 {
-	loadSound('kick.ogg', KICK);
-	loadSound('hat.ogg', HAT);
-	loadSound('snare.ogg', SNARE);
-	loadSound('p1.ogg', 3);
-	loadSound('p2.ogg', 4);
-	loadSound('p3.ogg', 5);
-	loadSound('p4.ogg', 6);
-	loadSound('p5.ogg', 7);
-	loadSound('p6.ogg', 8);
-	loadSound('p7.ogg', 9);
-	loadSound('pb1.ogg', 10);
-	loadSound('pb2.ogg', 11);
-	//gap for black keys, buildKeyboard() creates their IDs
-	loadSound('pb3.ogg', 13);
-	loadSound('pb4.ogg', 14);
-	loadSound('pb5.ogg', 15);
-	loadSound('tap.ogg', 16);
+	loadSound('kick');
+	loadSound('hat');
+	loadSound('snare');
+	loadPianoSounds(); //getAllPianoNotes().forEach(soundName => loadSound(soundName));
+	//should be based on keyamount, same loop as create keyboard
+	//piano sounds loaded when keyboardbuilt?
+	// loadSound('p1');
+	// loadSound('p2');
+	// loadSound('p3');
+	// loadSound('p4');
+	// loadSound('p5');
+	// loadSound('p6');
+	// loadSound('p7');
+	//
+	//
+	// loadSound('pb1');
+	// loadSound('pb2');
+	// //gap for black keys, buildKeyboard() creates their IDs
+	// loadSound('pb3');
+	// loadSound('pb4');
+	// loadSound('pb5');
+	// loadSound('tap');
+
 	loadGuitarSounds();
+	// loadSound('kick.ogg', KICK);
+	// loadSound('hat.ogg', HAT);
+	// loadSound('snare.ogg', SNARE);
+	// loadSound('p1.ogg', 3);
+	// loadSound('p2.ogg', 4);
+	// loadSound('p3.ogg', 5);
+	// loadSound('p4.ogg', 6);
+	// loadSound('p5.ogg', 7);
+	// loadSound('p6.ogg', 8);
+	// loadSound('p7.ogg', 9);
+	// loadSound('pb1.ogg', 10);
+	// loadSound('pb2.ogg', 11);
+	// //gap for black keys, buildKeyboard() creates their IDs
+	// loadSound('pb3.ogg', 13);
+	// loadSound('pb4.ogg', 14);
+	// loadSound('pb5.ogg', 15);
+	// loadSound('tap.ogg', 16);
+	// loadGuitarSounds();
 }
 
-function loadSound(url, bufferIndex, guitarFretIndex)
+function loadPianoSounds()
+{
+	//get key number
+	let allPianoNotes = getAllPianoNotes();
+	allPianoNotes.forEach(soundName => loadSound(soundName));
+}
+
+// function loadSound(url, bufferIndex, guitarFretIndex)
+function loadSound(soundName)
 {
   var request = new XMLHttpRequest();
-	let urlWithFolder = 'sounds/'+url;
+	let urlWithFolder = 'sounds/'+soundName+'.ogg';
   request.open('GET', urlWithFolder, true);
   request.responseType = 'arraybuffer';
 
@@ -84,15 +118,17 @@ function loadSound(url, bufferIndex, guitarFretIndex)
 	{
     context.decodeAudioData(request.response, function(buffer)
 		{
+			allBuffers[soundName] = buffer;
 			// if(url.charAt(0) == 'g')
-			if(urlWithFolder.charAt(7) == 'g')
-			{
-				guitarBuffers[bufferIndex-1][guitarFretIndex] = buffer;
-			}
-			else
-			{
-				allBuffers[bufferIndex] = buffer;
-			}
+			// if(urlWithFolder.charAt(7) == 'g')
+			// if(urlWithFolder.charAt(7) == 'g')
+			// {
+			// 	guitarBuffers[bufferIndex-1][guitarFretIndex] = buffer;
+			// }
+			// else
+			// {
+			// 	allBuffers[bufferIndex] = buffer;
+			// }
 			// allBuffers.push(buffer);
     });
   }
@@ -129,7 +165,8 @@ function loadGuitarSounds()
 
 			if(exists)
 			{
-				loadSound(url+".ogg", string, fret);
+				// loadSound(url+".ogg", string, fret);
+				loadSound(url);
 			}
 
 		}
@@ -156,10 +193,14 @@ function transpose(direction)
 }
 
 //delay is in milliseconds
-function playSound(buffer, delay, stringNumber)
+// function playSound(buffer, delay, stringNumber, soundName)
+function playSound(soundName, delay, stringNumber)
 {
+	// buffer = getBufferByName(soundName);
+	buffer = allBuffers[soundName];
 	var source = context.createBufferSource();
 	source.buffer = buffer;
+
 	// source.connect(context.destination);
 	var gainNode = context.createGain()
 	gainNode.gain.value = 1.0; // 10 %
@@ -184,6 +225,9 @@ function playSound(buffer, delay, stringNumber)
 		}
 		stringSources[stringNumber] = [source, gainNode];
 	}
+
+	activeSounds[soundName] = [source, gainNode];
+
 	//add to array (to stop if needed), remove when finished playing
 	// activeSounds.push(source);
 	// setTimeout(function()
@@ -214,34 +258,40 @@ function playStoppableSound(buffer, delay, arrayId)
 //only applies to sounds that cannot be duplicated
 // e.g the same piano key, the same guitar string
 //  need once played again, delete last source
-function stopSoundApi(stringNumber, delay)
-{
-	//get source from activeSounds from soundName
-	let bufferSource =  stringSources[stringNumber][0];
-	let bufferGainNode =  stringSources[stringNumber][1];
-	// setTimeout(function()
-	// {
-	// 	bufferGainNode.gain.value = 0.0;
-	// }, delay);
-	bufferGainNode.gain.setTargetAtTime(0.0, context.currentTime, 0.1);
+// function stopSoundApi(stringNumber, delay)
+// {
+// 	//get source from activeSounds from soundName
+// 	let bufferSource =  stringSources[stringNumber][0];
+// 	let bufferGainNode =  stringSources[stringNumber][1];
+// 	// setTimeout(function()
+// 	// {
+// 	// 	bufferGainNode.gain.value = 0.0;
+// 	// }, delay);
+// 	bufferGainNode.gain.setTargetAtTime(0.0, context.currentTime, 0.1);
+//
+// 	// stopSound(bufferSource, delay);
+// }
 
-	// stopSound(bufferSource, delay);
+function stopSoundApi(soundName, delay)
+{
+	activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime, 0.1);
 }
 
-function stopSound(bufferSource, delay)
-{
-	let adjustedDelay = 0;
-	if(delay != 0)
-	{
-		adjustedDelay = context.currentTime+delay/1000;
-	}
-	bufferSource.stop(adjustedDelay);
-}
+// function stopSound(bufferSource, delay)
+// {
+// 	let adjustedDelay = 0;
+// 	if(delay != 0)
+// 	{
+// 		adjustedDelay = context.currentTime+delay/1000;
+// 	}
+// 	bufferSource.stop(adjustedDelay);
+// }
 
 function getBufferByName(soundName)
 {
 	let buffer;
 	let arrayIndex;
+	// buffer
 	if(soundName.charAt(0) == 'p')
 	{
 		if(soundName.charAt(1) == 'b')
@@ -255,7 +305,8 @@ function getBufferByName(soundName)
 			//black keys start at 10
 			arrayIndex = parseInt(soundName.charAt(2))+9;
 		}
-		else {
+		else
+		{
 			arrayIndex = parseInt(soundName.charAt(1))+2;
 		}
 		buffer = allBuffers[arrayIndex];
@@ -284,33 +335,6 @@ function getBufferByName(soundName)
 	{
 		buffer = allBuffers[16];
 	}
-	// else if(soundName == 'p1')
-	// {
-	// 	buffer = allBuffers[arrayIndex];
-	// }
-	// else if(soundName == 'p2')
-	// {
-	// 	buffer = allBuffers[4];
-	// }
-	// else if(soundName == 'p3')
-	// {
-	// 	buffer = allBuffers[5];
-	// }
-	// else if(soundName == 'p4')
-	// {
-	// 	buffer = allBuffers[6];
-	// }
-	// else if(soundName == 'p5')
-	// {
-	// 	buffer = allBuffers[7];
-	// }
-	// else if(soundName == 'p6')
-	// {
-	// 	buffer = allBuffers[8];
-	// }
-	// else if(soundName == 'p7')
-	// {
-	// 	buffer = allBuffers[9];
-	// }
+
 	return buffer;
 }

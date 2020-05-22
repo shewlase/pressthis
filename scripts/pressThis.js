@@ -167,7 +167,7 @@ function init()
   initS1Loops();
 
 	setStage(stage);
-	buildKeyboard(21);
+	buildKeyboard(15);
 
 	// initStageTwo();
 	loadImages();
@@ -333,6 +333,11 @@ function createCloseRandomPhase(noteCount)
 	}
 	// loopRandomTrack(randomTrack, 0);
 	return randomTrack;
+}
+
+function getAllPianoNotes()
+{
+	return allPianoNotes;
 }
 
 //get 3 random keys, change the three images
@@ -623,7 +628,8 @@ function animateAndPlaySound(soundName, delay, stringNumber)
 	}
 	else
 	{
-		playSound(getBufferByName(soundName), delay, stringNumber);
+		// playSound(getBufferByName(soundName), delay, stringNumber, soundName);
+		playSound(soundName, delay, stringNumber);
 	}
 }
 //Run everytime a letter is tapped/clicked
@@ -1264,6 +1270,7 @@ function moveLettersToBack()
 function buildKeyboard(numKeys)
 {
 	whiteKeyNum = numKeys;
+	allPianoNotes = [];
 	// numKeys = 5;
 	// keyboardRight.style.left = (numKeys-3)*22-2+'%';
 	//get keyboard height
@@ -1292,6 +1299,11 @@ function buildKeyboard(numKeys)
 		{
 			tap(keyId);
 		}
+		keyElement.onmouseup = function(event)
+		{
+			// stopSoundLocal(keyId);
+			stopSound(keyId);
+		}
 		keyElement.onmouseenter = function(event)
 		{
 			if(leftMouseDown)
@@ -1299,13 +1311,16 @@ function buildKeyboard(numKeys)
 				tap(keyId);
 			}
 		}
-		keyElement.onmouseexit = function(event)
+		keyElement.onmouseleave = function(event)
 		{
 			//will be same as mouse up code i.e. stop sound
+			// stopSoundLocal(keyId);
+			stopSound(keyId);
 		}
 
 		let keyBg = keyElement.cloneNode(true);
 		keyElement.id = keyId;
+		// allPianoNotes.push(keyId);
 
 		keyElement.classList.add("whiteKey");
 		keyElement.src = "images/whiteKey.png";
@@ -1325,7 +1340,8 @@ function buildKeyboard(numKeys)
 
 			let blackKeyElement = document.createElement("IMG");
 			let blackKeyId = "pb"+(i+1);
-			// allPianoNotes.push(blackKeyId);
+			allPianoNotes.push(blackKeyId);
+
 			blackKeyElement.style.left = leftBlackPos+"vw";
 			blackKeyElement.onmousedown = function(event)
 			{
@@ -1493,7 +1509,7 @@ function animate(soundName, delay)
 					element.src = "images/whiteKeyHighlighted.png";
 					setTimeout(function()
 					{
-						 element.src = "images/whiteKey.png";
+						 // element.src = "images/whiteKey.png";
 						 // if(riffProgress != 0)
 						 // {
 						 if(stage == QUICK)
@@ -1632,6 +1648,18 @@ function playSoundLocal(soundName)
 	var audioID = soundName+"Audio";
 	document.getElementById(audioID).currentTime = 0;
 	document.getElementById(audioID).play();
+}
+
+function stopSound(soundName)
+{
+	if(testingLocal)
+	{
+		stopSoundLocal(soundName);
+	}
+	else
+	{
+		stopSoundApi(soundName, 0);
+	}
 }
 
 function stopSoundLocal(soundName)
@@ -1975,14 +2003,45 @@ document.onmouseup = function(evt)
 }
 
 //should be element tpgether in array
-let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220];//q to ]
+let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
+let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
 // let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
 function hotkeyTap(keyCode)
 {
+	tap(keyCodeToSoundname(keyCode));
+}
+
+function checkStopSound(keyCode)
+{
+	let soundName = keyCodeToSoundname(keyCode);
+	if(soundName != 'none')
+	{
+		stopSound(soundName);
+		document.getElementById(soundName).src = "images/whiteKey.png";
+	}
+}
+
+
+function keyCodeToSoundname(keyCode)
+{
+	let soundName = 'none';
 	if(pianoHotkeys.includes(keyCode))
 	{
 		let soundIndex = pianoHotkeys.indexOf(keyCode);
-		tap('p'+(soundIndex+1));
+		// tap('p'+(soundIndex+1));
+		soundName = 'p'+(soundIndex+1);
+	}
+	else if(blackHotkeys.includes(keyCode))
+	{
+		let soundIndex = blackHotkeys.indexOf(keyCode);
+		let octave = Math.floor(soundIndex/5);
+		let offset = octave;
+		if(soundIndex >= 2)
+		{
+			offset += 1;
+		}
+		// tap('pb'+(soundIndex+1+offset));
+		soundName = 'pb'+(soundIndex+1+offset);
 	}
 	// else if(guitarHotkeys.includes(keyCode))
 	// {
@@ -1991,7 +2050,10 @@ function hotkeyTap(keyCode)
 	// 	// fretKeyDown(7, emShape);
 	// 	// 	stringTap(4, true);
 	// }
+
+	return soundName;
 }
+let lastKey = -1;
 let recordedKeyCodes = [];
 let recordString = '';
 document.onkeydown = function(evt) {
@@ -2000,62 +2062,42 @@ document.onkeydown = function(evt) {
 	//could just do
 	// var codeAsChar = String.fromCharCode(event.keyCode).toLowerCase();
 	// tap(codeAsChar);
-	// hotkeyTap(event.keyCode);
+	if(lastKey != evt.keyCode)	hotkeyTap(event.keyCode);
+	lastKey = event.keyCode;
+
 	//need check if keycode is in current instrument hotkeys, do hotkeyTap
-	// recordedKeyCodes.push(event.keyCode);
+	recordedKeyCodes.push(event.keyCode);
 	// recordString = recordString.concat((event.keyCode+', '));
 		switch(event.keyCode){
-    case 81:  //q
-			tap('kick');
-			break;
-    case 87:  //w
-			tap('hat');
-			break;
-
-		case 69: //e
-			tap('snare');
-			break;
-		case 82: //R
-			// pianoKeyPressed('p1');
-			tap('p1');
-			// tap('snare');
-			break;
-		case 84: //T
-			tap('p2');
-			break;
-		case 89: //Y
-			tap('p3');
-			break;
-		case 85: //u
-			tap('p4');
-			break;
-		case 73: //i
-			tap('p5');
-			break;
-		case 79: //o
-			tap('p6');
-			break;
-		case 80: //p
-			tap('p7');
-			break;
+    // case 81:  //q
+		// 	tap('kick');
+		// 	break;
+    // case 87:  //w
+		// 	tap('hat');
+		// 	break;
+		//
+		// case 69: //e
+		// 	tap('snare');
+		// 	break;
 
 
-		case 49: //1
-		// allTracks[1].clear();
-		// allTracks[1].togglePlaying();
-		setStage(STUDIO);
-			break;
-		case 50: //2
-		// allTracks[2].togglePlaying();
-		setStage(QUICK);
-			break;
-		case 51: //3
-		// allTracks[3].togglePlaying();
-		setStage(INTRO);
-			break;
-		case 52: //4
-		// toggleMetronome();
-			break;
+
+		// case 49: //1
+		// // allTracks[1].clear();
+		// // allTracks[1].togglePlaying();
+		// setStage(STUDIO);
+		// 	break;
+		// case 50: //2
+		// // allTracks[2].togglePlaying();
+		// setStage(QUICK);
+		// 	break;
+		// case 51: //3
+		// // allTracks[3].togglePlaying();
+		// setStage(INTRO);
+		// 	break;
+		// case 52: //4
+		// // toggleMetronome();
+		// 	break;
 
 
 		case 65: //A
@@ -2085,13 +2127,13 @@ document.onkeydown = function(evt) {
 			// case 99: //PAD3
 			// 	stringTap(4, true);
 			// 	break;
-			case 105: //PAD7
+			case 102: //PAD6
 				stringTap(4, true);
 				break;
-			case 104: //PAD8
+			case 101: //PAD5
 				stringTap(3, true);
 				break;
-			case 103: //PAD9
+			case 100: //PAD4
 				stringTap(2, true);
 				break;
 			case 37: //LEFT
@@ -2099,21 +2141,44 @@ document.onkeydown = function(evt) {
 				break;
 
 			//piano
-		case 53: //5
-			tap('pb1');
-			break;
-		case 54: //6
-			tap('pb2');
-			break;
-		case 56: //8
-			tap('pb4');
-			break;
-		case 57: //9
-			tap('pb5');
-			break;
-		case 48: //0
-			tap('pb6');
-			break;
+		// case 82: //R
+		// 	tap('p1');
+		// 	break;
+		// case 84: //T
+		// 	tap('p2');
+		// 	break;
+		// case 89: //Y
+		// 	tap('p3');
+		// 	break;
+		// case 85: //u
+		// 	tap('p4');
+		// 	break;
+		// case 73: //i
+		// 	tap('p5');
+		// 	break;
+		// case 79: //o
+		// 	tap('p6');
+		// 	break;
+		// case 80: //p
+		// 	tap('p7');
+		// 	break;
+
+
+		// case 53: //5
+		// 	tap('pb1');
+		// 	break;
+		// case 54: //6
+		// 	tap('pb2');
+		// 	break;
+		// case 56: //8
+		// 	tap('pb4');
+		// 	break;
+		// case 57: //9
+		// 	tap('pb5');
+		// 	break;
+		// case 48: //0
+		// 	tap('pb6');
+		// 	break;
 
 		case 76: //L
 			// playNextPhase();
@@ -2146,8 +2211,13 @@ document.onkeydown = function(evt) {
 			// clearInterval(loopTimer);
 			// toggleStudio();
 			// createOneRandomPhase(5);
-			console.log(record.join("', '"));
-			record = [];
+
+
+
+			// console.log(record.join("', '"));
+			console.log(recordedKeyCodes.join(", "));
+			helpText.innerHTML = recordedKeyCodes.join(", ");
+			// record = [];
 			break;
 		case 66: //B
 			// barPosition = 3;
@@ -2171,9 +2241,11 @@ document.onkeydown = function(evt) {
 		}
 }
 
-document.onkeyup = function(evt) {
-
-		switch(event.keyCode)
+document.onkeyup = function(evt)
+{
+	checkStopSound(evt.keyCode);
+	lastKey = -1;
+		switch(evt.keyCode)
 		{
 			case 90: //Z
 				//hand image to up, stop sound
