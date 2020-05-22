@@ -31,7 +31,7 @@ const INTRO = 1;
 const TWO = 2;
 const QUICK = 3;
 let stages = [STUDIO, INTRO, TWO, QUICK];
-let stage = INTRO;
+let stage = STUDIO;
 let quickMode = 'learn'; //play and learn
 let leftMouseDown = false;
 let multipleGuide, songTitle, progressBar;//could make it quickDiv
@@ -133,13 +133,16 @@ let allRiffs = [];
 let currentRiff = [];
 let currentRifNumber = 0;
 let wrongNoteCount = 0;
+
+let keyboardRight;
+let windowWidth;
 //need tempo and timing here
 //tempo = 90; //bpm
 init();
 function init()
 {
 	testingLocal = window.location.protocol == ("file:");
-
+	windowWidth = window.innerWidth;
 	hat = document.getElementById("hat");
 	kick = document.getElementById("kick");
 	snare = document.getElementById("snare");
@@ -153,9 +156,9 @@ function init()
 	multipleGuide = document.getElementById('multipleGuide');
 	songTitle = document.getElementById('songTitle');
 	progressBar = document.getElementById('progressBar');
+	keyboardRight = document.getElementById('keyboardRight');
 	// document.appendChild(multipleGuide);
 	// loadSounds();
-	buildKeyboard();
 	preLoaded = [];
 	playingStrings = [];
 	hotkeyLetters = [];
@@ -164,6 +167,7 @@ function init()
   initS1Loops();
 
 	setStage(stage);
+	buildKeyboard(21);
 
 	// initStageTwo();
 	loadImages();
@@ -201,6 +205,7 @@ function initQuick()
 	multipleGuide.style.display = 'block';
 	progressBar.style.display = 'block';
 	drumDiv.style.display = "none";
+	//need tracks div?
 	document.getElementById("recordButton1").style.display = 'none';
 	document.getElementById("trashTrack1").style.display = 'none';
 	// // helpText.style.opacity = "0";
@@ -219,7 +224,9 @@ function initQuick()
 	// drumDiv.style.top = "2vw";
 	keyboardDiv.style.top = "9vw";
 	keyboardDiv.style.left = "20vw";
-	keyboardDiv.style.width = "60vw";
+	keyboardDiv.style.height = "40vw";
+
+	// keyboardDiv.style.width = "60vw";
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "none";
 	// startRandomPhases();
@@ -533,12 +540,18 @@ function initStudio()
 	drumDiv.style.top = "2vw";
 	drumDiv.style.display = "block";
 	keyboardDiv.style.top = "7vw";
-	keyboardDiv.style.left = "57vw";
-	keyboardDiv.style.width = "30vw";
+	keyboardDiv.style.left = "1vw";
+	// keyboardDiv.style.left = "57vw";
+	// keyboardDiv.style.width = "30vw";
+	keyboardDiv.style.height = "17vw";
+
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "block";
-	document.getElementById("fullWhite").style.display = "block";
-	document.getElementById("tempoButton").style.display = "block";
+	unhighlightPiano();
+	// document.getElementById("fullWhite").style.display = "block";
+	// document.getElementById("tempoButton").style.display = "block";
+	document.getElementById("recordButton1").style.display = 'none';
+	document.getElementById("trashTrack1").style.display = 'none';
 	// can use like getAllTracks()[trackNumber];
 	getAllTracks()[1].isRecording = true;
 }
@@ -623,7 +636,7 @@ function tap(soundName, stringNumber)
 	{
 		string = stringNumber;
 	}
-
+	console.log(soundName);
 	if(!testingLocal && !checkAudioInit())
 	{
 		initApi();
@@ -1247,17 +1260,34 @@ function moveLettersToBack()
 // }
 
 //will eventually take key#, boardBg will stretch to fit all
-function buildKeyboard()
+// function buildKeyboard()
+function buildKeyboard(numKeys)
 {
-	whiteKeyNum = 7;
+	whiteKeyNum = numKeys;
+	// numKeys = 5;
+	// keyboardRight.style.left = (numKeys-3)*22-2+'%';
+	//get keyboard height
+	let numInOctave = 0;
+	let boardHeight = keyboardDiv.getBoundingClientRect().height;
+	// windowWidth = 1528;
+	let heightInVw = boardHeight/windowWidth*100;
+	// console.log(heightInVw, boardHeight);
+	let minWidth = 1.06*boardHeight;
+	let keyWidth = (0.24*boardHeight);
+	let addedWidth = (numKeys-3)*keyWidth;
+	keyboardDiv.style.width = (minWidth+addedWidth)/windowWidth*100+0.2*heightInVw+'vw';
+	keyboardMid.style.width = (numKeys-3+0.5)*keyWidth/windowWidth*100+'vw';//should take
+	//insert another middle portion, or increase width
 	//add x white keys, spaced @x%, add appropriate classes
-	for(let i = 0; i < whiteKeyNum; i++)
+	for(let i = 0; i < numKeys; i++)
 	{
-		let leftPos = 10.5+i*11.5;
+		let leftPos = 0.22*heightInVw+i*0.24*heightInVw;
+		// console.log(leftPos);
 		let keyElement = document.createElement("IMG");
 		let keyId = "p"+(i+1);
 		allPianoNotes.push(keyId);
-		keyElement.style.left = leftPos+"%";
+		// keyElement.style.left = leftPos+"%";
+		keyElement.style.left = leftPos+"vw";
 		keyElement.onmousedown = function(event)
 		{
 			tap(keyId);
@@ -1287,13 +1317,16 @@ function buildKeyboard()
 		// createHotkey(whiteKeyHotkeys[i], keyId, 0.05, 0.8);
 
 		//black keys
-		if(i != 2 && i != 6)
+		if(numInOctave != 2 && numInOctave != 6 && i < numKeys-1)
 		{
-			let leftBlackPos = 17+i*11.5;
+			// let leftBlackPos = 19.8+i*15.2;
+			// let leftPos = 0.20*heightInVw+i*0.24*heightInVw;
+			let leftBlackPos = 0.35*heightInVw+i*0.24*heightInVw;
+
 			let blackKeyElement = document.createElement("IMG");
 			let blackKeyId = "pb"+(i+1);
 			// allPianoNotes.push(blackKeyId);
-			blackKeyElement.style.left = leftBlackPos+"%";
+			blackKeyElement.style.left = leftBlackPos+"vw";
 			blackKeyElement.onmousedown = function(event)
 			{
 				//move element down x, and return after a time
@@ -1323,8 +1356,13 @@ function buildKeyboard()
 			blackKeys.push(blackKeyElement);
 		}
 
-
+		if(numInOctave == 7) //0-7
+		{
+			numInOctave = 0;
+		}
+		numInOctave++;
 	}
+
 	//have to add all black keys on top of white
 	for(let i = 0; i < blackKeys.length; i = i+2)
 	{
@@ -1911,6 +1949,7 @@ function clearLoopTimers()
 	// clearInterval(loopTimer);
 }
 
+
 document.onmousedown = function(evt)
 {
 
@@ -1935,14 +1974,36 @@ document.onmouseup = function(evt)
 	}
 }
 
+//should be element tpgether in array
+let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220];//q to ]
+// let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
+function hotkeyTap(keyCode)
+{
+	if(pianoHotkeys.includes(keyCode))
+	{
+		let soundIndex = pianoHotkeys.indexOf(keyCode);
+		tap('p'+(soundIndex+1));
+	}
+	// else if(guitarHotkeys.includes(keyCode))
+	// {
+	// 	let soundIndex = pianoHotkeys.indexOf(keyCode);
+	// 	tap('g'+soundIndex);//different, have sorted by string? leftHandHotKeys/rightHand
+	// 	// fretKeyDown(7, emShape);
+	// 	// 	stringTap(4, true);
+	// }
+}
+let recordedKeyCodes = [];
+let recordString = '';
 document.onkeydown = function(evt) {
 	/* console.log(evt.which); */
 	/* if(evt.which == 81) */
 	//could just do
 	// var codeAsChar = String.fromCharCode(event.keyCode).toLowerCase();
 	// tap(codeAsChar);
-
-
+	// hotkeyTap(event.keyCode);
+	//need check if keycode is in current instrument hotkeys, do hotkeyTap
+	// recordedKeyCodes.push(event.keyCode);
+	// recordString = recordString.concat((event.keyCode+', '));
 		switch(event.keyCode){
     case 81:  //q
 			tap('kick');

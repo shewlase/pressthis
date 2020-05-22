@@ -3,10 +3,11 @@ body{
  overflow: hidden;
  cursor: none;
 }
-img{
+img
+{
 	position: absolute;
-	width: 25%;
-  user-select: none;
+	/* width: 25%; */
+	user-select: none;
 	/* pointer-events: none; */
 }
 h1
@@ -138,44 +139,63 @@ p
 
 #keyboardDiv
 {
-	left: 28vw;
-	top: 100vw;
+	/* left: 28vw; */
+	/* top: 100vw; */
 	position: absolute;
-	width: 60vw;
+	/* height: 20vw; */
+	/* width: 60vw; */
 	transition: all 2s ease 0s;
 	z-index: 2;
 }
 
-#keyboardMain
+#keyboardLeft, #keyboardRight, #keyboardMid
 {
 	position:relative;
-	width: 100%;
+	/* width: 100%; */
+	height: 100%;
 	top: 0px;
+	transition: width 1s ease;
+}
+
+#keyboardRight
+{
+  left:-3vw;
+}
+
+#keyboardMid
+{
+  left: -1vw;
+  /* outline: 2px solid yellow; */
+  /* in chunks of 22% */
+  /* width: 22%; */
+  /* background-image: url('images/keyboardMid.png'); */
 }
 
 .whiteKey, .whiteKeyBg
 {
 	position:absolute;
-	width: 10%;
+	/* width: 13%; */
+	height: 52%;
 }
 
 .blackKey, .blackKeyBg
 {
 	position:absolute;
-	width: 8%;
+	/* width: 11.5%; */
+	height: 42%;
 }
 
 .blackKey
 {
 /* left: 16%; */
 top: 35%;
-	transition: all 0.05s ease 0s;
+transition: all 0.05s ease 0s;
 }
 
 .blackKeyBg
 {
 	top: 39%;
-	height: auto;
+	/* height: auto; */
 }
 
 .whiteKeyBg
