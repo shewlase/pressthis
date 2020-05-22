@@ -636,7 +636,7 @@ function tap(soundName, stringNumber)
 	{
 		string = stringNumber;
 	}
-	console.log(soundName);
+	// console.log(soundName);
 	if(!testingLocal && !checkAudioInit())
 	{
 		initApi();
