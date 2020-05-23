@@ -292,6 +292,7 @@ function playStoppableSound(buffer, delay, arrayId)
 
 function stopSoundApi(soundName, delay)
 {
+	//need to delete after? doesnt take much space
 	activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime, 0.1);
 }
 

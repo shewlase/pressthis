@@ -1729,20 +1729,22 @@ function mutePlayingStrings()
 	{
 		let stringNumber = playingStrings[i];
 		let stopDelay = i*50;
+		let soundName = getSoundFromStringId(stringNumber);
 		if(testingLocal)
 		{
 			// setTimeout(function()
 			// {
 				//stop any sounds from this string
-				stopSoundLocal(getSoundFromStringId(stringNumber));
+				stopSoundLocal(soundName);
 			// }, stopDelay);//stops quickly played notes on same string
 		}
 		else
 		{
-			stopSoundApi(stringNumber, stopDelay);
+			//need sound name for stopApi, how stop any matching string?
+			stopSoundApi(soundName, 0);
+			// stopSoundApi(stringNumber, stopDelay);
 		}
 	}
-
 }
 
 //need to change only if higher than previous
@@ -2047,20 +2049,25 @@ document.onmouseup = function(evt)
 // let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
 // let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
 
-let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'];//q to 9num
+let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8', 'n9'];//q to 9num
 let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
-
+let stringHotkeys = ['n4', 'n5', 'n6'];
 
 // let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
 // let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
-function hotkeyTap(keyCode)
+function hotkeyTap(evt)
 {
-	tap(keyCodeToSoundname(keyCode));
+	let soundName = keyCodeToSoundname(evt);
+	//check if a valid soundname
+	if(soundName != 'none')
+	{
+		tap(soundName);
+	}
 }
 
-function checkStopSound(keyCode)
+function checkStopSound(evt)
 {
-	let soundName = keyCodeToSoundname(keyCode);
+	let soundName = keyCodeToSoundname(evt);
 	if(soundName != 'none')//check for p/pb
 	{
 		stopSound(soundName);
@@ -2079,18 +2086,29 @@ function checkStopSound(keyCode)
 }
 
 
-function keyCodeToSoundname(keyCode)
+function keyCodeToSoundname(evt)
 {
 	let soundName = 'none';
-	if(pianoHotkeys.includes(keyCode))
+	let key = evt.key;
+	let keyIsNumber = !isNaN(parseInt(evt.key));
+	if(keyIsNumber)
 	{
-		let soundIndex = pianoHotkeys.indexOf(keyCode);
+		//differentiate between keypad numbers
+		if(evt.location == 3)//keypad
+		{
+			key = 'n'+key;
+		}
+	}
+
+	if(pianoHotkeys.includes(key))
+	{
+		let soundIndex = pianoHotkeys.indexOf(key);
 		// tap('p'+(soundIndex+1));
 		soundName = 'p'+(soundIndex+1);
 	}
-	else if(blackHotkeys.includes(keyCode))
+	else if(blackHotkeys.includes(key))
 	{
-		let soundIndex = blackHotkeys.indexOf(keyCode);
+		let soundIndex = blackHotkeys.indexOf(key);
 		// let octave = Math.floor(soundIndex/5);
 		// let partialOctave = (soundIndex+1)%5;
 		// let offset = octave;
@@ -2122,7 +2140,7 @@ document.onkeydown = function(evt) {
 	//could just do
 	// var codeAsChar = String.fromCharCode(event.keyCode).toLowerCase();
 	// tap(codeAsChar);
-	if(lastKey != evt.keyCode)	hotkeyTap(event.key);
+	if(lastKey != evt.keyCode)	hotkeyTap(event);
 	// if(lastKey != evt.keyCode)	hotkeyTap(event.keyCode);
 	lastKey = event.keyCode;
 
@@ -2305,7 +2323,7 @@ document.onkeydown = function(evt) {
 document.onkeyup = function(evt)
 {
 	// checkStopSound(evt.keyCode);
-	checkStopSound(evt.key);
+	checkStopSound(evt);
 	lastKey = -1;
 		switch(evt.keyCode)
 		{
