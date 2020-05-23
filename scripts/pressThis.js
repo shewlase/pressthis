@@ -22,6 +22,9 @@ var correctTaps = 0;
 let quickTapCount = 0;
 let phaseNumber = 0;
 
+let whiteKeyNum = 0;
+let blackKeyNum = 0;
+
 let songProgress = 0;
 
 var currentNote;
@@ -1303,6 +1306,7 @@ function buildKeyboard(numKeys)
 		{
 			// stopSoundLocal(keyId);
 			stopSound(keyId);
+			document.getElementById(keyId).src = "images/whiteKey.png";
 		}
 		keyElement.onmouseenter = function(event)
 		{
@@ -1340,6 +1344,7 @@ function buildKeyboard(numKeys)
 		{
 			// let leftBlackPos = 19.8+i*15.2;
 			// let leftPos = 0.20*heightInVw+i*0.24*heightInVw;
+			blackKeyNum++;
 			let leftBlackPos = 0.35*heightInVw+i*0.24*heightInVw;
 
 			let blackKeyElement = document.createElement("IMG");
@@ -1353,6 +1358,12 @@ function buildKeyboard(numKeys)
 				// whiteKeyPressed(event.target);
 				tap(blackKeyId);
 			}
+			blackKeyElement.onmouseup = function(event)
+			{
+				// stopSoundLocal(keyId);
+				stopSound(blackKeyId);
+				blackKeyElement.src = "images/blackKey.png";
+			}
 			blackKeyElement.onmouseenter = function(event)
 			{
 				if(leftMouseDown)
@@ -1361,9 +1372,14 @@ function buildKeyboard(numKeys)
 				}
 
 			}
-			blackKeyElement.onmouseexit = function(event)
+			blackKeyElement.onmouseleave = function(event)
 			{
 				//will be same as mouse up code
+				if(leftMouseDown)
+				{
+					stopSound(blackKeyId);
+					blackKeyElement.src = "images/blackKey.png";
+				}
 			}
 			let blackKeyBg = blackKeyElement.cloneNode(true);
 			blackKeyElement.id = blackKeyId;
@@ -1372,8 +1388,10 @@ function buildKeyboard(numKeys)
 			blackKeyElement.src = "images/blackKey.png";
 			blackKeyBg.classList.add("blackKeyBg");
 			blackKeyBg.src = "images/blackKeyBg.png";
-			blackKeys.push(blackKeyBg);
-			blackKeys.push(blackKeyElement);
+			//should be .push([blackKeyElement, blackKeyBg]);
+			blackKeys.push([blackKeyBg, blackKeyElement])
+			// blackKeys.push(blackKeyBg);
+			// blackKeys.push(blackKeyElement);
 		}
 
 		if(numInOctave == 7) //0-7
@@ -1384,13 +1402,14 @@ function buildKeyboard(numKeys)
 	}
 
 	//have to add all black keys on top of white
-	for(let i = 0; i < blackKeys.length; i = i+2)
+	for(let i = 0; i < blackKeys.length; i++)
 	{
-		let blackKeyEl = blackKeys[i];
-		let blackKeyBgEl = blackKeys[i+1];
-
-		document.getElementById('keyboardDiv').appendChild(blackKeyEl);
+		let blackKeyEl = blackKeys[i][1];
+		let blackKeyBgEl = blackKeys[i][0];
+		// let blackKeyEl = blackKeys[i];
+		// let blackKeyBgEl = blackKeys[i+1];
 		document.getElementById('keyboardDiv').appendChild(blackKeyBgEl);
+		document.getElementById('keyboardDiv').appendChild(blackKeyEl);
 		// document.getElementById('keyboardDiv').appendChild(blackKeyBg);
 		// document.getElementById('keyboardDiv').appendChild(blackKeyElement);
 	}
@@ -1534,7 +1553,7 @@ function animate(soundName, delay)
 					element.src = "images/blackKeyHighlighted.png";
 					setTimeout(function()
 					{
-						element.src = "images/blackKey.png";
+						// element.src = "images/blackKey.png";
 						if(stage == QUICK)
 						{
 							updateThreeKeys();
@@ -1926,16 +1945,34 @@ function createDrumHotkeys()
 function createKeyboardHotkeys()
 {
 	let xPercent = 0.15;
-	let yPercent = 0.45;
-	createHotkey("5", blackKeys[1].id, xPercent, yPercent);
-	createHotkey("6", blackKeys[3].id, xPercent, yPercent);
-	createHotkey("8", blackKeys[5].id, xPercent, yPercent);
-	createHotkey("9", blackKeys[7].id, xPercent, yPercent);
-	createHotkey("0", blackKeys[9].id, xPercent, yPercent);
+	// createHotkey("5", blackKeys[1].id, xPercent, yPercent);
+	// createHotkey("6", blackKeys[3].id, xPercent, yPercent);
+	// createHotkey("8", blackKeys[5].id, xPercent, yPercent);
+	// createHotkey("9", blackKeys[7].id, xPercent, yPercent);
+	// createHotkey("0", blackKeys[9].id, xPercent, yPercent);
+	let hotKeyHackArray = blackHotkeys.filter(a => a !== -1);
+	// for(let i = 0; i < blackKeyNum; i++)
+	for(let i = 0; i < blackKeys.length; i++)
+	{
+		let keyId = blackKeys[i][1].id;
+		// createHotkey(whiteKeyHotkeys[i].toUpperCase(), keyId, xPercent, 0.55);
+		let hotkey = hotKeyHackArray[i];
+		// if(hotkey == null || hotkey == -1)
+		if(hotkey == null)
+		{
+			hotkey = '';
+			// i++;
+		}
+		createHotkey(hotkey, keyId, xPercent, 0.55);
+	}
+
 	for(let i = 0; i < whiteKeyNum; i++)
 	{
 		let keyId = "p"+(i+1);
-		createHotkey(whiteKeyHotkeys[i].toUpperCase(), keyId, xPercent, 0.55);
+		// createHotkey(whiteKeyHotkeys[i].toUpperCase(), keyId, xPercent, 0.55);
+		let hotkey = pianoHotkeys[i];
+		if(hotkey == null) hotkey = '';
+		createHotkey(hotkey, keyId, xPercent, 0.65);
 	}
 }
 
@@ -2007,8 +2044,13 @@ document.onmouseup = function(evt)
 }
 
 //should be element tpgether in array
-let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
-let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
+// let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
+// let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
+
+let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'];//q to 9num
+let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
+
+
 // let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
 // let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
 function hotkeyTap(keyCode)
@@ -2019,10 +2061,20 @@ function hotkeyTap(keyCode)
 function checkStopSound(keyCode)
 {
 	let soundName = keyCodeToSoundname(keyCode);
-	if(soundName != 'none')
+	if(soundName != 'none')//check for p/pb
 	{
 		stopSound(soundName);
-		document.getElementById(soundName).src = "images/whiteKey.png";
+		if(soundName.charAt(0) == 'p')
+		{
+			if(soundName.charAt(1) == 'b')//white keys
+			{
+				document.getElementById(soundName).src = "images/blackKey.png";
+			}
+			else
+			{
+				document.getElementById(soundName).src = "images/whiteKey.png";
+			}
+		}
 	}
 }
 
@@ -2060,6 +2112,7 @@ function keyCodeToSoundname(keyCode)
 
 	return soundName;
 }
+
 let lastKey = -1;
 let recordedKeyCodes = [];
 let recordString = '';
@@ -2069,11 +2122,12 @@ document.onkeydown = function(evt) {
 	//could just do
 	// var codeAsChar = String.fromCharCode(event.keyCode).toLowerCase();
 	// tap(codeAsChar);
-	if(lastKey != evt.keyCode)	hotkeyTap(event.keyCode);
+	if(lastKey != evt.keyCode)	hotkeyTap(event.key);
+	// if(lastKey != evt.keyCode)	hotkeyTap(event.keyCode);
 	lastKey = event.keyCode;
 
 	//need check if keycode is in current instrument hotkeys, do hotkeyTap
-	recordedKeyCodes.push(event.keyCode);
+	recordedKeyCodes.push(event.key);
 	// recordString = recordString.concat((event.keyCode+', '));
 		switch(event.keyCode){
     // case 81:  //q
@@ -2222,7 +2276,7 @@ document.onkeydown = function(evt) {
 
 
 			// console.log(record.join("', '"));
-			console.log(recordedKeyCodes.join(", "));
+			console.log(recordedKeyCodes.join("', '"));
 			helpText.innerHTML = recordedKeyCodes.join(", ");
 			// record = [];
 			break;
@@ -2250,7 +2304,8 @@ document.onkeydown = function(evt) {
 
 document.onkeyup = function(evt)
 {
-	checkStopSound(evt.keyCode);
+	// checkStopSound(evt.keyCode);
+	checkStopSound(evt.key);
 	lastKey = -1;
 		switch(evt.keyCode)
 		{
