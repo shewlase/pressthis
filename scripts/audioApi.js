@@ -58,6 +58,7 @@ function loadAllSounds()
 	loadSound('hat');
 	loadSound('snare');
 	loadPianoSounds(); //getAllPianoNotes().forEach(soundName => loadSound(soundName));
+	loadGuitarSounds();
 	//should be based on keyamount, same loop as create keyboard
 	//piano sounds loaded when keyboardbuilt?
 	// loadSound('p1');
@@ -77,7 +78,6 @@ function loadAllSounds()
 	// loadSound('pb5');
 	// loadSound('tap');
 
-	loadGuitarSounds();
 	// loadSound('kick.ogg', KICK);
 	// loadSound('hat.ogg', HAT);
 	// loadSound('snare.ogg', SNARE);
@@ -103,6 +103,24 @@ function loadPianoSounds()
 	//get key number
 	let allPianoNotes = getAllPianoNotes();
 	allPianoNotes.forEach(soundName => loadSound(soundName));
+	// for(let i = 0; i < allPianoNotes.length; i++)
+	// {
+	// 	let soundName = allPianoNotes[i];
+	// 	if(soundName.charAt(1) == 'b')
+	// 	{
+	// 		//if length 4, number is chars 2 and 3
+	// 		let soundIndex = parseInt(soundName.charAt(2));
+	// 		// let soundIndex = blackHotkeys.indexOf(keyCode);
+	// 		let octave = Math.floor(soundIndex/5);
+	// 		let offset = octave;
+	// 		if(soundIndex >= 2)
+	// 		{
+	// 			offset += 1;
+	// 		}
+	// 		// tap('pb'+(soundIndex+1+offset));
+	// 		soundName = 'pb'+(soundIndex+1+offset);
+	// 	}
+	// }
 }
 
 // function loadSound(url, bufferIndex, guitarFretIndex)

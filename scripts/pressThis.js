@@ -1315,7 +1315,11 @@ function buildKeyboard(numKeys)
 		{
 			//will be same as mouse up code i.e. stop sound
 			// stopSoundLocal(keyId);
-			stopSound(keyId);
+			if(leftMouseDown)
+			{
+				stopSound(keyId);
+				document.getElementById(keyId).src = "images/whiteKey.png";
+			}
 		}
 
 		let keyBg = keyElement.cloneNode(true);
@@ -2004,7 +2008,8 @@ document.onmouseup = function(evt)
 
 //should be element tpgether in array
 let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
-let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
+let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
+// let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
 // let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
 function hotkeyTap(keyCode)
 {
@@ -2034,14 +2039,16 @@ function keyCodeToSoundname(keyCode)
 	else if(blackHotkeys.includes(keyCode))
 	{
 		let soundIndex = blackHotkeys.indexOf(keyCode);
-		let octave = Math.floor(soundIndex/5);
-		let offset = octave;
-		if(soundIndex >= 2)
-		{
-			offset += 1;
-		}
+		// let octave = Math.floor(soundIndex/5);
+		// let partialOctave = (soundIndex+1)%5;
+		// let offset = octave;
+		// if(partialOctave > 2)
+		// {
+		// 	offset += 1;
+		// }
 		// tap('pb'+(soundIndex+1+offset));
-		soundName = 'pb'+(soundIndex+1+offset);
+		soundName = 'pb'+(soundIndex+1);
+		// soundName = 'pb'+(soundIndex+1+offset);
 	}
 	// else if(guitarHotkeys.includes(keyCode))
 	// {
