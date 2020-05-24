@@ -10,7 +10,7 @@ let mouseX, mouseY; //should setMousePosition();
 let hotkeyLetters;
 let showHotkeys = false;
 let allHotkeys;
-let studioDiv;
+let studioDiv, guitarDiv;
 //CONTROLLER
 	//only View() and Model() (Game())?
 	//handleTap() -> game.tap();
@@ -139,6 +139,9 @@ let wrongNoteCount = 0;
 
 let keyboardRight;
 let windowWidth;
+
+let drumHotkeys;
+
 //need tempo and timing here
 //tempo = 90; //bpm
 init();
@@ -160,12 +163,14 @@ function init()
 	songTitle = document.getElementById('songTitle');
 	progressBar = document.getElementById('progressBar');
 	keyboardRight = document.getElementById('keyboardRight');
+	guitarDiv = document.getElementById("guitarDiv");
 	// document.appendChild(multipleGuide);
 	// loadSounds();
 	preLoaded = [];
 	playingStrings = [];
 	hotkeyLetters = [];
 	allHotkeys = [];
+	drumHotkeys = ['j', 'k', 'l'];
 	loopTimers = [];
   initS1Loops();
 
@@ -535,23 +540,26 @@ function initStudio()
 	multipleGuide.style.display = 'none';
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
-	// helpText.style.opacity = "0";
+
+	//only for loop tutorial
+	helpText.style.opacity = "0";
 	helpText.style.transform = "rotate(0deg)";
 	helpText.innerHTML = "Press 4x to </br> set speed";
 	helpText.style.left = "40vw";
 	helpText.style.top = "35vw";
 	helpText.style.width = "";
 
-	drumDiv.style.width = "60vw";
+	drumDiv.style.width = "40vw";
 	drumDiv.style.height = "40vh";
-	drumDiv.style.left = "5vw";
+	drumDiv.style.left = "2vw";
 	drumDiv.style.top = "2vw";
 	drumDiv.style.display = "block";
-	keyboardDiv.style.top = "7vw";
-	keyboardDiv.style.left = "1vw";
-	// keyboardDiv.style.left = "57vw";
-	// keyboardDiv.style.width = "30vw";
-	keyboardDiv.style.height = "17vw";
+
+	keyboardDiv.style.top = "6vw";
+	keyboardDiv.style.left = "37vw";
+	keyboardDiv.style.height = "12vw";
+
+	guitarDiv.style.display = 'block';
 
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "block";
@@ -1713,12 +1721,12 @@ function toggleGuitar()
 	showGuitar = !showGuitar;
 	if(showGuitar)
 	{
-		document.getElementById("guitarDiv").style.display = "block";
+		guitarDiv.style.display = "block";
 		cursorImage.style.width = "10vw";
 	}
 	else
 	{
-		document.getElementById("guitarDiv").style.display = "none";
+		guitarDiv.style.display = "none";
 		cursorImage.style.width = "5vw";
 	}
 }
@@ -1939,9 +1947,12 @@ function createDrumHotkeys()
 {
 	let xPercent = 0.42;
 	let yPercent = 0.55;
-	createHotkey('Q', 'kick', xPercent, yPercent);
-	createHotkey('W', 'hat',xPercent, yPercent);
-	createHotkey('E', 'snare', xPercent, yPercent);
+	createHotkey(drumHotkeys[0], 'kick', xPercent, yPercent);
+	createHotkey(drumHotkeys[1], 'hat',xPercent, yPercent);
+	createHotkey(drumHotkeys[2], 'snare', xPercent, yPercent);
+	// createHotkey('Q', 'kick', xPercent, yPercent);
+	// createHotkey('W', 'hat',xPercent, yPercent);
+	// createHotkey('E', 'snare', xPercent, yPercent);
 }
 
 function createKeyboardHotkeys()
@@ -2052,6 +2063,7 @@ document.onmouseup = function(evt)
 let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8', 'n9'];//q to 9num
 let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
 let stringHotkeys = ['n4', 'n5', 'n6'];
+// let drumHotkeys = ['a', 's', 'd'];
 
 // let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
 // let pianoHotkeys = [90, 88, 67, 86, 66, 78, 77, 188, 190, 191];//z to /
@@ -2119,6 +2131,25 @@ function keyCodeToSoundname(evt)
 		// tap('pb'+(soundIndex+1+offset));
 		soundName = 'pb'+(soundIndex+1);
 		// soundName = 'pb'+(soundIndex+1+offset);
+	}
+	else if(drumHotkeys.includes(key))
+	{
+		let soundIndex = drumHotkeys.indexOf(key);
+		switch(soundIndex)
+		{
+			case 0:
+				soundName = 'kick';
+				break;
+			case 1:
+				soundName = 'hat';
+				break;
+			case 2:
+				soundName = 'snare';
+				break;
+			// case 0:
+			// 	soundName = 'kick';
+			// 	break;
+		}
 	}
 	// else if(guitarHotkeys.includes(keyCode))
 	// {
