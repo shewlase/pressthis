@@ -11,12 +11,14 @@ let hotkeyLetters;
 let showHotkeys = false;
 let allHotkeys;
 let studioDiv, guitarDiv;
+let recordButton1;
 //CONTROLLER
 	//only View() and Model() (Game())?
 	//handleTap() -> game.tap();
 //MODEL - GAME
 var testingLocal;
 var isAudioInit = false;
+let isLoopTutorial = false;
 var clickNumber = 0;
 var correctTaps = 0;
 let quickTapCount = 0;
@@ -164,6 +166,7 @@ function init()
 	progressBar = document.getElementById('progressBar');
 	keyboardRight = document.getElementById('keyboardRight');
 	guitarDiv = document.getElementById("guitarDiv");
+	recordButton1 = document.getElementById("recordButton1");
 	// document.appendChild(multipleGuide);
 	// loadSounds();
 	preLoaded = [];
@@ -214,7 +217,7 @@ function initQuick()
 	progressBar.style.display = 'block';
 	drumDiv.style.display = "none";
 	//need tracks div?
-	document.getElementById("recordButton1").style.display = 'none';
+	recordButton1.style.display = 'none';
 	document.getElementById("trashTrack1").style.display = 'none';
 	// // helpText.style.opacity = "0";
 	// helpText.style.transform = "rotate(0deg)";
@@ -532,6 +535,47 @@ function createRandomPhases()
 	}
 }
 
+function startLoopTutorial()
+{
+	isLoopTutorial = true;
+	tempoButton.style.right = "45vw";
+	tempoButton.style.bottom = "20vw";
+	//only for loop tutorial
+	// helpText.style.opacity = "0";
+	fullWhite.style.opacity = "1.0";
+	helpText.style.transform = "rotate(0deg)";
+	helpText.innerHTML = "Press 4x to </br> set speed";
+	helpText.style.left = "40vw";
+	helpText.style.top = "30vw";
+	helpText.style.width = "";
+
+	document.getElementById("fullWhite").style.display = "block";
+	// document.getElementById("tempoButton").style.display = "block";
+	// recordButton1.style.display = 'none';
+	// document.getElementById("trashTrack1").style.display = 'none';
+}
+
+function checkIfLoopTutorial()
+{
+	return isLoopTutorial;
+}
+
+function hideLoopTutorialStart()
+{
+	helpText.style.transform = "rotate(-5deg)";
+	helpText.innerHTML = "Play something!";
+	helpText.style.left = "5vw";
+	helpText.style.top = "40vw";
+	fullWhite.style.opacity = "0.0";
+	tempoButton.style.bottom = "3vw";
+	tempoButton.style.right = "3vw";
+	//only if intro
+	setTimeout(function()
+	{
+		fullWhite.style.display = "none";
+	}, 1000);//match transition time
+}
+
 function initStudio()
 {
 	snare.style.opacity = "1";
@@ -541,13 +585,7 @@ function initStudio()
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
 
-	//only for loop tutorial
-	helpText.style.opacity = "0";
-	helpText.style.transform = "rotate(0deg)";
-	helpText.innerHTML = "Press 4x to </br> set speed";
-	helpText.style.left = "40vw";
-	helpText.style.top = "35vw";
-	helpText.style.width = "";
+
 
 	drumDiv.style.width = "40vw";
 	drumDiv.style.height = "40vh";
@@ -563,11 +601,9 @@ function initStudio()
 
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "block";
+	tempoButton.style.display = 'block';
 	unhighlightPiano();
-	// document.getElementById("fullWhite").style.display = "block";
-	// document.getElementById("tempoButton").style.display = "block";
-	document.getElementById("recordButton1").style.display = 'none';
-	document.getElementById("trashTrack1").style.display = 'none';
+
 	// can use like getAllTracks()[trackNumber];
 	getAllTracks()[1].isRecording = true;
 }
@@ -666,7 +702,8 @@ function tap(soundName, stringNumber)
 
 	if(stage == STUDIO)//should be ==STAGE -> stageXTap(soundName)
 	{
-		studioTap(soundName);
+		//should be on stopsound or at end of loop (for now)
+		recordTap(soundName);
 	}
 	else if(stage == INTRO)
 	{
@@ -989,7 +1026,7 @@ function stringTap(stringNumber, isStrum)
 	{
 		soundName = "g"+stringNumber+"0";
 	}
-
+	playingStrings.push(stringNumber);
 	if(leftMouseDown || isStrum)
 	{
 		// playSoundLocal(soundName);
@@ -1314,6 +1351,8 @@ function buildKeyboard(numKeys)
 		{
 			// stopSoundLocal(keyId);
 			stopSound(keyId);
+			saveNoteToTrack(soundName);
+
 			document.getElementById(keyId).src = "images/whiteKey.png";
 		}
 		keyElement.onmouseenter = function(event)
@@ -1330,6 +1369,8 @@ function buildKeyboard(numKeys)
 			if(leftMouseDown)
 			{
 				stopSound(keyId);
+				saveNoteToTrack(soundName);
+
 				document.getElementById(keyId).src = "images/whiteKey.png";
 			}
 		}
@@ -1370,6 +1411,8 @@ function buildKeyboard(numKeys)
 			{
 				// stopSoundLocal(keyId);
 				stopSound(blackKeyId);
+				saveNoteToTrack(soundName);
+
 				blackKeyElement.src = "images/blackKey.png";
 			}
 			blackKeyElement.onmouseenter = function(event)
@@ -1386,6 +1429,8 @@ function buildKeyboard(numKeys)
 				if(leftMouseDown)
 				{
 					stopSound(blackKeyId);
+					saveNoteToTrack(soundName);
+
 					blackKeyElement.src = "images/blackKey.png";
 				}
 			}
@@ -1693,7 +1738,18 @@ function stopSound(soundName)
 	}
 }
 
-function stopSoundLocal(soundName)
+function saveNoteToTrack(soundName)
+{
+	if(stage == STUDIO && getIsRecording()) //&& recording?
+	{
+		//add note with duration
+		//add duration to recording note
+		//LOOPER playsound api with stopsoundapi(duration as delay)
+		setNoteDuration(soundName);
+	}
+}
+
+function stopSoundLocal(soundName, delay)
 {
 	//need if g, get string, and mute all from that string
 	// if(soundName.charAt(0) == "g")
@@ -1709,8 +1765,12 @@ function stopSoundLocal(soundName)
 	// 	}
 	// }
 	// else{
+	setTimeout(function()
+	{
 		var audioID = soundName+"Audio";
 		document.getElementById(audioID).pause();
+	}, delay);
+
 	// }
 
 }
@@ -1738,21 +1798,25 @@ function mutePlayingStrings()
 		let stringNumber = playingStrings[i];
 		let stopDelay = i*50;
 		let soundName = getSoundFromStringId(stringNumber);
-		if(testingLocal)
-		{
-			// setTimeout(function()
-			// {
-				//stop any sounds from this string
-				stopSoundLocal(soundName);
-			// }, stopDelay);//stops quickly played notes on same string
-		}
-		else
-		{
-			//need sound name for stopApi, how stop any matching string?
-			stopSoundApi(soundName, 0);
-			// stopSoundApi(stringNumber, stopDelay);
-		}
+
+		stopSound(soundName);//cant call this cos saves to loop
+		saveNoteToTrack(soundName);
+		// if(testingLocal)
+		// {
+		// 	// setTimeout(function()
+		// 	// {
+		// 		//stop any sounds from this string
+		// 		stopSoundLocal(soundName);
+		// 	// }, stopDelay);//stops quickly played notes on same string
+		// }
+		// else
+		// {
+		// 	//need sound name for stopApi, how stop any matching string?
+		// 	stopSoundApi(soundName, 0);
+		// 	// stopSoundApi(stringNumber, stopDelay);
+		// }
 	}
+	playingStrings = [];
 }
 
 //need to change only if higher than previous
@@ -2060,7 +2124,7 @@ document.onmouseup = function(evt)
 // let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
 // let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
 
-let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8', 'n9'];//q to 9num
+let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8'];//q to 9num
 let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
 let stringHotkeys = ['n4', 'n5', 'n6'];
 // let drumHotkeys = ['a', 's', 'd'];
@@ -2077,26 +2141,33 @@ function hotkeyTap(evt)
 	}
 }
 
+//on key up
 function checkStopSound(evt)
 {
 	let soundName = keyCodeToSoundname(evt);
 	if(soundName != 'none')//check for p/pb
 	{
 		stopSound(soundName);
-		if(soundName.charAt(0) == 'p')
-		{
-			if(soundName.charAt(1) == 'b')//white keys
-			{
-				document.getElementById(soundName).src = "images/blackKey.png";
-			}
-			else
-			{
-				document.getElementById(soundName).src = "images/whiteKey.png";
-			}
-		}
+		saveNoteToTrack(soundName);
+		//only if p, need others for
+		resetPianoKey(soundName);
 	}
 }
 
+function resetPianoKey(soundName)
+{
+	if(soundName.charAt(0) == 'p')
+	{
+		if(soundName.charAt(1) == 'b')//white keys
+		{
+			document.getElementById(soundName).src = "images/blackKey.png";
+		}
+		else
+		{
+			document.getElementById(soundName).src = "images/whiteKey.png";
+		}
+	}
+}
 
 function keyCodeToSoundname(evt)
 {
@@ -2166,31 +2237,14 @@ let lastKey = -1;
 let recordedKeyCodes = [];
 let recordString = '';
 document.onkeydown = function(evt) {
-	/* console.log(evt.which); */
-	/* if(evt.which == 81) */
-	//could just do
-	// var codeAsChar = String.fromCharCode(event.keyCode).toLowerCase();
-	// tap(codeAsChar);
+
+	//should be if any current/active hotkey array contains event.key
 	if(lastKey != evt.keyCode)	hotkeyTap(event);
-	// if(lastKey != evt.keyCode)	hotkeyTap(event.keyCode);
 	lastKey = event.keyCode;
 
-	//need check if keycode is in current instrument hotkeys, do hotkeyTap
 	recordedKeyCodes.push(event.key);
 	// recordString = recordString.concat((event.keyCode+', '));
 		switch(event.keyCode){
-    // case 81:  //q
-		// 	tap('kick');
-		// 	break;
-    // case 87:  //w
-		// 	tap('hat');
-		// 	break;
-		//
-		// case 69: //e
-		// 	tap('snare');
-		// 	break;
-
-
 
 		// case 49: //1
 		// // allTracks[1].clear();
@@ -2211,13 +2265,14 @@ document.onkeydown = function(evt) {
 
 
 		case 65: //A
+
 			break;
 		case 83: //S
+
 			break;
 		case 68: //D
 			fretKeyDown(5, aShape);
 			break;
-
 		case 90: //Z
 			fretKeyDown(3, eShape);
 			break;
@@ -2299,13 +2354,13 @@ document.onkeydown = function(evt) {
 			// createDrumHotkeys();
 			// createKeyboardHotkeys();
 			// toggleHotkeys();
-			let phaseSize = 7;//will be dynamic phaseLengths[phasePos]
-
-			 // add phaseLengths[0 - phasePos]
-			let phaseStart = phasePos*phaseSize;//will be add all previous notes
-			twinkleTrack.queueSomeNotes(phaseStart, phaseStart+phaseSize, 0);
-			phasePos++;
-			break;
+				// let phaseSize = 7;//will be dynamic phaseLengths[phasePos]
+				//
+				//  // add phaseLengths[0 - phasePos]
+				// let phaseStart = phasePos*phaseSize;//will be add all previous notes
+				// twinkleTrack.queueSomeNotes(phaseStart, phaseStart+phaseSize, 0);
+				// phasePos++;
+				// break;
 		case 77: //M
 			// playNextPhase();
 			// loopPhase(8);

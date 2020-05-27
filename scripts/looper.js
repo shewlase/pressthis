@@ -22,7 +22,7 @@ class Track
     }
   }
 
-  // addNote(soundName, timeFromStart, duration)
+
   addNote(soundName, beatsFromStart, duration)
   {
     // this.notes.push(new Note(soundName, timeFromStart, duration));
@@ -55,9 +55,28 @@ class Track
       let note = this.notes[i];
       let delayInMs = note.beatsFromStart*loopBeatTime;
       let delay = delayInMs+queueDelay;
+      let duration = note.duration;
       let soundName = note.soundName;
       // pianoKeyPressed(soundName, delay);
       animateAndPlaySound(soundName, delay, -1);//note needs to store string/isguitar
+
+      // stopSoundApi(soundName, duration);
+      if(testingLocal)
+      {
+        setTimeout(function()
+        {
+          resetPianoKey(soundName);
+        }, delay+duration)
+        stopSoundLocal(soundName, delay+duration);
+      }
+      else
+      {
+        setTimeout(function()
+        {
+          resetPianoKey(soundName);
+        }, delay+duration)
+        stopSoundApi(soundName, delay+duration);
+      }
     }
   }
 
@@ -113,10 +132,12 @@ let startTime;
 let trackRecording;
 let playMetronome = true;
 let quantizeTo;
-let showingIntro = true;
+// let showingIntro = true;
 let tempo;
 
 let metronomeTimer, trackLoopTimer;
+
+let toAdd = {};
 
 initStudioLooper();
 function initStudioLooper()
@@ -128,6 +149,11 @@ function initStudioLooper()
     allTracks[i] = newTrack;
   }
   // timesBetween = [];
+}
+
+function getIsRecording()
+{
+  return isRecording;
 }
 
 function setBeatTime(timeMs)
@@ -174,19 +200,21 @@ function toggleMetronome()
 // {
 //
 // }
-
-function studioTap(soundName)
+// let currentlyHeldNotes = [];
+// = ['soundName', startTime, notes index?]
+//for recording
+function recordTap(soundName)
 {
   let tapTime;
   tapTime = new Date().getTime();
   if(isRecording)//should be if any track.isrecording
 	{
     recordedTap++;
-    //could loop for all recording tracks it enable multi track recording;
+    //could loop for all recording tracks if enable multi track recording;
     // i.e. if(track.isRecording) track.addnote
     let track = allTracks[trackRecording];
     let timeSinceStart = tapTime - startTime;
-    if(recordedTap == 1)//first recorded tap //need and if intro
+    if(recordedTap == 1 && isLoopTutorial)//first recorded tap //need and if intro
     {
       //timeout 4xbeat to show next message
       setTimeout(function()
@@ -194,17 +222,33 @@ function studioTap(soundName)
         helpText.innerHTML = "Press to save loop";
       }, loopBeatTime*4);
     }
-      // startTime = tapTime;
-      let quantizedTime = roundToNearestQuant(timeSinceStart);
-      // console.log(quantizedTime, "then");
-      // if(typeof quantizedTime === "undefined")
-      // {
-      //   quantizedTime = timeSinceStart;
-      // }
-      // console.log(quantizedTime);
-      let beatsFromStart = quantizedTime/loopBeatTime;
-      track.addNote(soundName, beatsFromStart);
+    // startTime = tapTime;
+    let quantizedTime = roundToNearestQuant(timeSinceStart);
+    // console.log(quantizedTime, "then");
+    // if(typeof quantizedTime === "undefined")
+    // {
+    //   quantizedTime = timeSinceStart;
+    // }
+    // console.log(quantizedTime);
+    let beatsFromStart = quantizedTime/loopBeatTime;
+    // currentlyHeldNotes.push(soundName);
+    // currentlyHeldNotes.push(track.notes.length); //need index in track to edit duration
+    // track.addNote(soundName, beatsFromStart);
+    toAdd[soundName] = [beatsFromStart, tapTime]
 	}
+}
+
+function getNoteCount()
+{
+  let track = allTracks[trackRecording];
+  return track.notes.length;
+}
+
+function setNoteDuration(soundName)
+{
+  let track = allTracks[trackRecording];
+  let duration = new Date().getTime() - toAdd[soundName][1]; //need to be ms?
+  track.addNote(soundName, toAdd[soundName][0], duration);
 }
 
 function roundToNearestQuant(timeSinceStart)
@@ -246,19 +290,12 @@ function tempoTap()
     //studio turorial
     trackRecording = 1;
     isRecording = true;
-    helpText.style.transform = "rotate(-5deg)";
-  	helpText.innerHTML = "Play something!";
-  	helpText.style.left = "5vw";
-  	helpText.style.top = "40vw";
-    fullWhite.style.opacity = "0.0";
-    tempoButton.style.bottom = "3vw";
-    tempoButton.style.right = "3vw";
     document.getElementById("tempoInput").value = tempo;
-    //only if intro
-    setTimeout(function()
+
+    if(checkIfLoopTutorial())
     {
-      fullWhite.style.display = "none";
-    }, 1000);//match transition time
+      hideLoopTutorialStart();
+    }
 
 
 
@@ -366,9 +403,11 @@ function cycleTrackButton(trackNumber) //or update track state?
       track.isPlaying = true;
       // console.log("empty start record");
       // startTime = new Date().getTime();
-      if(showingIntro)
+      // if(showingIntro)
+      if(isLoopTutorial)
       {
         helpText.innerHTML = "And that's it!";
+        isLoopTutorial = false; //hide help text?
       }
     }
     else
@@ -388,7 +427,7 @@ function cycleTrackButton(trackNumber) //or update track state?
     playMetronome = false;
     // console.log("stop recording");
     //if first recorded track, set
-    if(showingIntro)
+    if(isLoopTutorial)
     {
       helpText.innerHTML = "Press again </br>to pause";
     }
@@ -399,7 +438,7 @@ function cycleTrackButton(trackNumber) //or update track state?
     // console.log("stop playing");
     clearInterval(trackLoopTimer);
     document.getElementById("recordButton"+trackNumber).src = "images/trackButtonPaused.png";
-    if(showingIntro)
+    if(isLoopTutorial)
     {
       helpText.innerHTML = "Press trash </br>can to delete";
     }
@@ -415,7 +454,7 @@ function clearTrack(trackNumber)
   clearInterval(trackLoopTimer);
   track.isPlaying = false;
   document.getElementById("recordButton"+trackNumber).src = "images/trackButtonEmpty.png"
-  if(showingIntro)
+  if(isLoopTutorial)
   {
     helpText.innerHTML = "Press to start</br> new loop";
   }

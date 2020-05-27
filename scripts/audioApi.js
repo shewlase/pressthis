@@ -57,6 +57,7 @@ function loadAllSounds()
 	loadSound('kick');
 	loadSound('hat');
 	loadSound('snare');
+	loadSound('metronome');
 	loadPianoSounds(); //getAllPianoNotes().forEach(soundName => loadSound(soundName));
 	loadGuitarSounds();
 	//should be based on keyamount, same loop as create keyboard
@@ -293,7 +294,7 @@ function playStoppableSound(buffer, delay, arrayId)
 function stopSoundApi(soundName, delay)
 {
 	//need to delete after? doesnt take much space
-	activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime, 0.1);
+	activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime+delay/1000, 0.1);
 }
 
 // function stopSound(bufferSource, delay)

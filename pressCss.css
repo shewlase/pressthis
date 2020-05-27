@@ -45,8 +45,10 @@ p
 {
   position: absolute;
   width: 10vw;
-  right: 45vw;
-  bottom: 40vh;
+  right: 1vw;
+  bottom: 1vw;
+  /* right: 45vw;
+  bottom: 40vh; */
   z-index: 5;
   display: none;
 }
@@ -213,7 +215,7 @@ p
 {
 	position: absolute;
 	width: 10vw;
-	z-index: 6;
+	z-index: 100;
 	transform-origin: 15% 0%;
 	/* transform: rotate(-10deg); */
 	pointer-events: none;
@@ -279,7 +281,7 @@ p
   left: 10vw;
   width: 80vw;
   height: 26vw;
-  z-index: 5;
+  z-index: 4;
   /* background-color: gray; */
 }
 
@@ -423,6 +425,7 @@ p
   left: 90%;
   margin-right: 0;
 	font-size: 1vw;
+  z-index: 99;
 }
 
 .toggle p
