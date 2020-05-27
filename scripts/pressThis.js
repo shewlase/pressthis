@@ -142,7 +142,7 @@ let wrongNoteCount = 0;
 let keyboardRight;
 let windowWidth;
 
-let drumHotkeys;
+let drumHotkeys, guitarHotkeys;
 
 //need tempo and timing here
 //tempo = 90; //bpm
@@ -174,6 +174,8 @@ function init()
 	hotkeyLetters = [];
 	allHotkeys = [];
 	drumHotkeys = ['j', 'k', 'l'];
+	guitarHotkeys = ['a', 's', 'd', 'z', 'x', 'c', 'n4', 'n5', 'n6'];
+
 	loopTimers = [];
   initS1Loops();
 
@@ -183,6 +185,7 @@ function init()
 	// initStageTwo();
 	loadImages();
 	createDrumHotkeys();
+	createGuitarHotkeys();
 	setTimeout(createKeyboardHotkeys, 1000);
 
 }
@@ -335,7 +338,7 @@ function createCloseRandomPhase(noteCount)
 		}
 
 		let thisNote = pentaPianoNotes[randomClosePos];
-		console.log(randomClosePos, thisNote);
+		// console.log(randomClosePos, thisNote);
 		//between 0.5 and 2??
 		if(i!=0) randomBeats += Math.ceil(Math.random()*2)*+0.5;
 
@@ -1351,7 +1354,7 @@ function buildKeyboard(numKeys)
 		{
 			// stopSoundLocal(keyId);
 			stopSound(keyId);
-			saveNoteToTrack(soundName);
+			saveNoteToTrack(keyId);
 
 			document.getElementById(keyId).src = "images/whiteKey.png";
 		}
@@ -1369,7 +1372,7 @@ function buildKeyboard(numKeys)
 			if(leftMouseDown)
 			{
 				stopSound(keyId);
-				saveNoteToTrack(soundName);
+				saveNoteToTrack(keyId);
 
 				document.getElementById(keyId).src = "images/whiteKey.png";
 			}
@@ -1411,7 +1414,7 @@ function buildKeyboard(numKeys)
 			{
 				// stopSoundLocal(keyId);
 				stopSound(blackKeyId);
-				saveNoteToTrack(soundName);
+				saveNoteToTrack(blackKeyId);
 
 				blackKeyElement.src = "images/blackKey.png";
 			}
@@ -1429,7 +1432,7 @@ function buildKeyboard(numKeys)
 				if(leftMouseDown)
 				{
 					stopSound(blackKeyId);
-					saveNoteToTrack(soundName);
+					saveNoteToTrack(blackKeyId);
 
 					blackKeyElement.src = "images/blackKey.png";
 				}
@@ -2007,6 +2010,42 @@ function writeAt(char, x, y)
 	multipleGuide.innerHTML = char;
 }
 
+// let topFretHotkeys = ['a', 's', 'd'];
+// let bottomFretHotkeys = ['z', 'x', 'c'];
+function createGuitarHotkeys()
+{
+	//3 top 3 bottom, 3 right (strings)
+	let allLabels = [];
+	for(let i = 0; i < 9; i++)
+	{
+		let letterEl = document.createElement('p');
+		letterEl.style.top = "15%";
+		letterEl.classList.add('hotkeyLetter');
+		letterEl.classList.add('hidden');
+		letterEl.innerHTML = guitarHotkeys[i];
+		allLabels.push(letterEl);
+		guitarDiv.appendChild(letterEl);
+		allHotkeys.push(letterEl);
+	}
+	allLabels[0].style.left = "25%";
+	allLabels[1].style.left = "35%";
+	allLabels[2].style.left = "45%";
+
+	allLabels[3].style.left = "25%";
+	allLabels[3].style.top = "55%";
+	allLabels[4].style.left = "35%";
+	allLabels[4].style.top = "55%";
+	allLabels[5].style.left = "45%";
+	allLabels[5].style.top = "55%";
+
+	allLabels[6].style.right = "0%";
+	allLabels[6].style.top = "17%";
+	allLabels[7].style.right = "0%";
+	allLabels[7].style.top = "35%";
+	allLabels[8].style.right = "0%";
+	allLabels[8].style.top = "53%";
+}
+
 function createDrumHotkeys()
 {
 	let xPercent = 0.42;
@@ -2126,7 +2165,9 @@ document.onmouseup = function(evt)
 
 let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8'];//q to 9num
 let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
-let stringHotkeys = ['n4', 'n5', 'n6'];
+// let stringHotkeys = ['n4', 'n5', 'n6'];
+// let topFretHotkeys = ['a', 's', 'd'];
+// let bottomFretHotkeys = ['z', 'x', 'c'];
 // let drumHotkeys = ['a', 's', 'd'];
 
 // let blackHotkeys = [50, 51, 53, 54, 55, 57, 48, 187];
