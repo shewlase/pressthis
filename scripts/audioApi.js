@@ -12,6 +12,7 @@ let stoppableSounds, activeSounds;
 
 var chunks, mediaStreamDestination, mediaRecorder;
 let isOggRecording = false;
+let readyRecord = false;
 //stores current playing sound for each string
 //     i.e. only one per string is possible
 let stringSources;
@@ -27,12 +28,13 @@ function initApi()
 	guitarBuffers = make2dArray(6);
 
 
-	var chunks = [];
+	chunks = [];
 	mediaStreamDestination = context.createMediaStreamDestination();
 	mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
 
 	mediaRecorder.ondataavailable = function(evt) {
 		// Recorded data is in `e.data`
+		chunks = [];
 		chunks.push(evt.data);
 	};
 
@@ -40,6 +42,7 @@ function initApi()
 	   // Make blob out of our blobs, and open it.
 	   var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
 		 let test = URL.createObjectURL(blob);
+		 loadSoundBlob(blob);
 	   document.querySelector("audio").src = test;
 	 };
 
@@ -175,6 +178,43 @@ function loadSound(soundName)
   request.send();
 }
 
+let loopBuffer;
+let blobLoopTimer;
+function loadSoundBlob(blob)
+{
+	const fileReader = new FileReader()
+	// Set up file reader on loaded end event
+	fileReader.onloadend = function()
+	{
+
+    // const arrayBuffer = fileReader.result as ArrayBuffer;
+		let myArrayBuffer = fileReader.result;
+
+		// Convert array buffer into audio buffer
+		// context.decodeAudioData(arrayBuffer, (audioBuffer) =>
+    context.decodeAudioData(myArrayBuffer, function(audioBuffer)
+		{
+			loopBuffer = audioBuffer;
+			playLoopBuffer();//start looping
+			blobLoopTimer = setInterval(function()
+			{
+				playLoopBuffer();//start looping
+			}, audioBuffer.duration*1000);
+    });
+	}
+
+	fileReader.readAsArrayBuffer(blob);
+	//Load blob
+}
+
+function playLoopBuffer()
+{
+	var source = context.createBufferSource();
+	source.buffer = loopBuffer;
+	source.connect(context.destination);
+	source.start(0);
+}
+
 function loadGuitarSounds()
 {
 	//from 1/0 to 6/22 (12 for now)
@@ -247,6 +287,11 @@ function playSound(soundName, delay, stringNumber)
 	source.connect(gainNode);
 	// source.connect(context.destination);
 	//use instrument volumes
+	if(readyRecord)
+	{
+		readyRecord = false;
+		mediaRecorder.start();
+	}
 	gainNode.connect(mediaStreamDestination);
 	gainNode.connect(context.destination);
 	// if(isOggRecording)
@@ -270,7 +315,7 @@ function playSound(soundName, delay, stringNumber)
 		if(	stringSources[stringNumber] != null)
 		{
 			// stringSources[stringNumber][0].stop();
-			//STOP
+			//STOP any playing sound on current string
 			stringSources[stringNumber][1].gain.setTargetAtTime(0.0, context.currentTime, 0.1);
 		}
 		stringSources[stringNumber] = [source, gainNode];
@@ -286,14 +331,19 @@ function playSound(soundName, delay, stringNumber)
 	// },buffer.duration*1000);
 }
 
-
+function readyToRecord()
+{
+	readyRecord = true;
+}
 
 function toggleOggRecording()
 {
 	isOggRecording = !isOggRecording;
 	if(isOggRecording)
 	{
-		mediaRecorder.start();
+		//starts on first playSound
+		clearInterval(blobLoopTimer);
+		readyToRecord();
 	}
 	else
 	{

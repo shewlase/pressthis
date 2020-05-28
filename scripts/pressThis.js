@@ -2394,9 +2394,10 @@ document.onkeydown = function(evt) {
 				toggleOggRecording();
 				// stringTap(2, true);
 				break;
-			// case 98: //PAD2
-			// 	stringTap(3, true);
-			// 	break;
+			case 98: //PAD2
+				playLoopBuffer();
+				// stringTap(3, true);
+				break;
 			// case 99: //PAD3
 			// 	stringTap(4, true);
 			// 	break;
