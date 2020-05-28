@@ -292,6 +292,13 @@ p
   top:0;
 }
 
+#knobTop
+{
+  width: 7%;
+  right: 5%;
+  bottom: 15%;
+}
+
 #fretHand
 {
   position: absolute;

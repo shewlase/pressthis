@@ -39,6 +39,7 @@
 				<div id="string3" draggable="false"  onmouseenter='stringTap(3)'></div>
 				<div id="string4" draggable="false" onmouseenter='stringTap(4)'></div> -->
 				<img id="fretHand" draggable='false' src="images/fretUp.png">
+				<img id='knobTop' src="images/knobTop.png" onmousedown="startVolumeDrag('guitar')">
 			</div>
 			<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
 			<div id="hotkeyToggle" class="toggle toggleDisabled" onmousedown="togglePressed('hotkeys', event)"><p>Hotkeys</p></div>
@@ -48,6 +49,8 @@
 				<img id="recordButton1" src='images/trackButtonRecording.png' onmousedown='cycleTrackButton(1)'>
 				<!-- Need trash class, should dynamic create all -->
 				<img id="trashTrack1" src='images/trashIcon.png' onmousedown='clearTrack(1)'>
+				<!-- <img id="recordButton1" src='images/trackButtonRecording.png' onmousedown='cycleTrackButton(2)'>
+				<img id="trashTrack1" src='images/trashIcon.png' onmousedown='clearTrack(2)'> -->
 				<input type="text" id="tempoInput">
 				<!-- <img id="recordButton1" src='trackButtonRecording.png' onmousedown='toggleRecord(1)'> -->
 				<div id="startLoopTutorial" class="toggle toggleDisabled" onmousedown="startLoopTutorial()"><p>Teach me.</p></div>
@@ -159,7 +162,7 @@
 
 
 	<audio id = "metronomeAudio">
-		<source src="sounds/tap.ogg" type="audio/ogg">
+		<source src="sounds/metronome.ogg" type="audio/ogg">
 	</audio>
 
 
@@ -172,6 +175,10 @@
 	<audio id = "g40Audio">
 		<source src="sounds/g40.ogg" type="audio/ogg">
 	</audio>
+
+	<audio id = "g23Audio">
+		<source src="sounds/g23.ogg" type="audio/ogg">
+	</audio>
 	<audio id = "g25Audio">
 		<source src="sounds/g25.ogg" type="audio/ogg">
 	</audio>
@@ -180,6 +187,9 @@
 	</audio>
 	<audio id = "g29Audio">
 		<source src="sounds/g29.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g33Audio">
+		<source src="sounds/g33.ogg" type="audio/ogg">
 	</audio>
 	<audio id = "g35Audio">
 		<source src="sounds/g35.ogg" type="audio/ogg">
@@ -190,8 +200,14 @@
 	<audio id = "g39Audio">
 		<source src="sounds/g39.ogg" type="audio/ogg">
 	</audio>
+	<audio id = "g42Audio">
+		<source src="sounds/g42.ogg" type="audio/ogg">
+	</audio>
 	<audio id = "g44Audio">
 		<source src="sounds/g44.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g45Audio">
+		<source src="sounds/g45.ogg" type="audio/ogg">
 	</audio>
 	<audio id = "g46Audio">
 		<source src="sounds/g46.ogg" type="audio/ogg">
@@ -201,6 +217,15 @@
 	</audio>
 	<audio id = "g48Audio">
 		<source src="sounds/g48.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g51Audio">
+		<source src="sounds/g51.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g53Audio">
+		<source src="sounds/g53.ogg" type="audio/ogg">
+	</audio>
+	<audio id = "g55Audio">
+		<source src="sounds/g55.ogg" type="audio/ogg">
 	</audio>
 </div>
 

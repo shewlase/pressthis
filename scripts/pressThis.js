@@ -28,6 +28,8 @@ let whiteKeyNum = 0;
 let blackKeyNum = 0;
 
 let songProgress = 0;
+let pianoVolume = 1.0;
+let guitarVolume = 0.2;
 
 var currentNote;
 var stageComplete = false;
@@ -167,6 +169,7 @@ function init()
 	keyboardRight = document.getElementById('keyboardRight');
 	guitarDiv = document.getElementById("guitarDiv");
 	recordButton1 = document.getElementById("recordButton1");
+	refreshVolumeKnobs();
 	// document.appendChild(multipleGuide);
 	// loadSounds();
 	preLoaded = [];
@@ -1098,21 +1101,68 @@ function strum(direction, stringDelay)
 	playingStrings = [];
 	if(direction < 0)
 	{
-		startString = 4;
+		startString = 5;
 	}
 	//
-	for(let i = startString; i <= 4; i = i+direction)//only strings 2 to 4 for now
+	for(let i = startString; i <= 5; i = i+direction)//only strings 2 to 4 for now
 	{
 		setTimeout(function(){
 			playingStrings.push(i);
 			stringTap(i, true);
 		}, pickDelay);
 		pickDelay += stringDelay;
-		if(direction < 0 && i < 3)
+		if(direction < 0 && i < 4)
 		{
 			break;
 		}
 	}
+}
+
+function getVolumeFromSoundName(soundName)
+{
+	let volume = 1.0;
+	if(soundName.charAt(0) == 'p')
+	{
+		volume = pianoVolume;
+	}
+	else if(soundName.charAt(0) == 'g')
+	{
+		volume = guitarVolume;
+	}
+	return volume;
+}
+
+
+let volumeDragStart, isDraggingVolume, volumeInstrument;
+function startVolumeDrag(instrument)
+{
+	isDraggingVolume = true;
+	volumeInstrument = instrument;
+	volumeDragStart = event.clientY;
+}
+
+function moveVolumeKnob(pixelsMoved)
+{
+	//update rotation and instrument volume
+	let currentRotation;
+	if(volumeInstrument == 'guitar') currrentRotation = guitarVolume/0.2*260-130;
+	if(volumeInstrument == 'piano') currrentRotation = guitarVolume/1*260-130;
+	// need to add to currentVolume rotation
+	let rotation = pixelsMoved/windowWidth*10*40; //should be based on screen width
+	let newRotation = currrentRotation+rotation;
+	if(newRotation > 130) newRotation = 130;
+	if(newRotation < -130) newRotation = -130;
+	//w/ instrument class could be volumeInstrument.volume = aksljasldkaj
+	if(volumeInstrument == 'guitar') guitarVolume = (newRotation+130)/260*0.2;
+	refreshVolumeKnobs();
+}
+
+//updates knob based on volume
+// function refreshVolumeKnob(rotation)
+function refreshVolumeKnobs()
+{
+	let guitarRotation = guitarVolume/0.2*260-130;
+	document.querySelector('#knobTop').style.transform = 'rotate('+guitarRotation+'deg)';
 }
 
 //shape E, bar 0, string1
@@ -1664,6 +1714,11 @@ document.onmousemove = function(event)
 	mouseX = event.clientX;
 	mouseY = event.clientY;
 	updateCursorImage(event);
+	if(isDraggingVolume)
+	{
+		let distanceMoved = volumeDragStart - mouseY;
+		moveVolumeKnob(distanceMoved);
+	}
 };
 
 
@@ -2125,6 +2180,7 @@ function toggleHotkeys()
 	// }
 }
 
+
 function clearLoopTimers()
 {
 	for(let i = 0; i < loopTimers.length; i++)
@@ -2152,6 +2208,12 @@ document.onmouseup = function(evt)
 {
 	leftMouseDown = false;
 	cursorImage.src = "images/cursor.png";
+	if(isDraggingVolume)
+	{
+		isDraggingVolume = false;
+		volumeInstrument = '';
+		volumeDragStart = null;
+	}
 	if(evt.which == 1)
 	{
 		// leftMouseDown = false;
@@ -2312,21 +2374,26 @@ document.onkeydown = function(evt) {
 
 			break;
 		case 68: //D
-			fretKeyDown(5, aShape);
+			fretKeyDown(3, aShape);
+			// fretKeyDown(5, aShape);
 			break;
 		case 90: //Z
-			fretKeyDown(3, eShape);
+			fretKeyDown(1, eShape);
+			// fretKeyDown(3, eShape);
 			break;
 		case 88: //X
-			fretKeyDown(5, eShape);
+			fretKeyDown(3, eShape);
+			// fretKeyDown(5, eShape);
 			break;
 		case 67: //C
-			fretKeyDown(7, emShape);
+			fretKeyDown(5, emShape);
+			// fretKeyDown(7, emShape);
 			break;
 
-			// case 97: //PAD1
-			// 	stringTap(2, true);
-			// 	break;
+			case 97: //PAD1
+				toggleOggRecording();
+				// stringTap(2, true);
+				break;
 			// case 98: //PAD2
 			// 	stringTap(3, true);
 			// 	break;
@@ -2334,13 +2401,13 @@ document.onkeydown = function(evt) {
 			// 	stringTap(4, true);
 			// 	break;
 			case 102: //PAD6
-				stringTap(4, true);
+				stringTap(5, true);
 				break;
 			case 101: //PAD5
-				stringTap(3, true);
+				stringTap(4, true);
 				break;
 			case 100: //PAD4
-				stringTap(2, true);
+				stringTap(3, true);
 				break;
 			case 37: //LEFT
 				stringTap(2, true);

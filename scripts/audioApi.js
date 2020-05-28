@@ -10,6 +10,8 @@ let contextInitiated = false;
 let stoppableSounds, activeSounds;
 // let activeSounds = {};
 
+var chunks, mediaStreamDestination, mediaRecorder;
+let isOggRecording = false;
 //stores current playing sound for each string
 //     i.e. only one per string is possible
 let stringSources;
@@ -23,6 +25,24 @@ function initApi()
 	activeSounds = {};
 	stringSources = [];
 	guitarBuffers = make2dArray(6);
+
+
+	var chunks = [];
+	mediaStreamDestination = context.createMediaStreamDestination();
+	mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+
+	mediaRecorder.ondataavailable = function(evt) {
+		// Recorded data is in `e.data`
+		chunks.push(evt.data);
+	};
+
+	mediaRecorder.onstop = function(evt) {
+	   // Make blob out of our blobs, and open it.
+	   var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+		 let test = URL.createObjectURL(blob);
+	   document.querySelector("audio").src = test;
+	 };
+
 
 	loadAllSounds();
 	// setTimeout(function()
@@ -137,6 +157,7 @@ function loadSound(soundName)
 	{
     context.decodeAudioData(request.response, function(buffer)
 		{
+			//increment loading percentage
 			allBuffers[soundName] = buffer;
 			// if(url.charAt(0) == 'g')
 			// if(urlWithFolder.charAt(7) == 'g')
@@ -219,13 +240,23 @@ function playSound(soundName, delay, stringNumber)
 	buffer = allBuffers[soundName];
 	var source = context.createBufferSource();
 	source.buffer = buffer;
-
-	// source.connect(context.destination);
-	var gainNode = context.createGain()
-	gainNode.gain.value = 1.0; // 10 %
-	gainNode.connect(context.destination);
 	source.playbackRate.value = playRate; //FOR SPREADING SAMPLE
+	var gainNode = context.createGain();
+	let volume = getVolumeFromSoundName(soundName);
+	gainNode.gain.value = volume; // 10 %
 	source.connect(gainNode);
+	// source.connect(context.destination);
+	//use instrument volumes
+	gainNode.connect(mediaStreamDestination);
+	gainNode.connect(context.destination);
+	// if(isOggRecording)
+	// {
+	// 	gainNode.connect(mediaStreamDestination);
+	// }
+	// else {
+	// 	gainNode.connect(context.destination);
+	// }
+
 
 	let adjustedDelay = 0;
 	if(delay != 0)
@@ -254,6 +285,22 @@ function playSound(soundName, delay, stringNumber)
 	// 	activeSounds.splice(activeSounds.indexOf(source), 1);
 	// },buffer.duration*1000);
 }
+
+
+
+function toggleOggRecording()
+{
+	isOggRecording = !isOggRecording;
+	if(isOggRecording)
+	{
+		mediaRecorder.start();
+	}
+	else
+	{
+		mediaRecorder.stop();
+	}
+}
+
 
 //e.g. guitar fret stop held down, keyboard key released
 function playStoppableSound(buffer, delay, arrayId)
