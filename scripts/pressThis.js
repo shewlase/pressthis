@@ -1035,7 +1035,6 @@ function stringTap(stringNumber, isStrum)
 	playingStrings.push(stringNumber);
 	if(leftMouseDown || isStrum)
 	{
-		// playSoundLocal(soundName);
 		tap(soundName, stringNumber);
 	}
 }
@@ -1780,8 +1779,10 @@ function loadImages()
 function playSoundLocal(soundName)
 {
 	var audioID = soundName+"Audio";
-	document.getElementById(audioID).currentTime = 0;
-	document.getElementById(audioID).play();
+	let audioElement = document.getElementById(audioID);
+	audioElement.volume = getVolumeFromSoundName(soundName);
+	audioElement.currentTime = 0;
+	audioElement.play();
 }
 
 function stopSound(soundName)
