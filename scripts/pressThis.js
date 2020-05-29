@@ -31,6 +31,9 @@ let songProgress = 0;
 let pianoVolume = 1.0;
 let guitarVolume = 0.2;
 
+let volumeDragStart, volumeInstrument;
+let isDraggingVolume = false;
+
 var currentNote;
 var stageComplete = false;
 const STUDIO = 0;
@@ -184,7 +187,7 @@ function init()
 
 	setStage(stage);
 	buildKeyboard(15);
-
+	addVolumeEventSquares();
 	// initStageTwo();
 	loadImages();
 	createDrumHotkeys();
@@ -1131,28 +1134,40 @@ function getVolumeFromSoundName(soundName)
 	return volume;
 }
 
-
-let volumeDragStart, isDraggingVolume, volumeInstrument;
 function startVolumeDrag(instrument)
 {
 	isDraggingVolume = true;
 	volumeInstrument = instrument;
 	volumeDragStart = event.clientY;
+	cursorImage.style.transformOrigin = '19% 27%';
+	//need to set left and top to correct knob position
 }
 
 function moveVolumeKnob(pixelsMoved)
 {
 	//update rotation and instrument volume
 	let currentRotation;
-	if(volumeInstrument == 'guitar') currrentRotation = guitarVolume/0.2*260-130;
-	if(volumeInstrument == 'piano') currrentRotation = guitarVolume/1*260-130;
+	if(volumeInstrument == 'guitar') currentRotation = guitarVolume/0.2*260-130;
+	if(volumeInstrument == 'keyboard') currentRotation = pianoVolume/1*260-130;
 	// need to add to currentVolume rotation
 	let rotation = pixelsMoved/windowWidth*10*40; //should be based on screen width
-	let newRotation = currrentRotation+rotation;
+	let newRotation = currentRotation+rotation;
 	if(newRotation > 130) newRotation = 130;
 	if(newRotation < -130) newRotation = -130;
 	//w/ instrument class could be volumeInstrument.volume = aksljasldkaj
 	if(volumeInstrument == 'guitar') guitarVolume = (newRotation+130)/260*0.2;
+	if(volumeInstrument == 'keyboard') pianoVolume = (newRotation+130)/260;
+
+	//should start from 0 degrees always
+		//need to store drag start volume
+		//current - start degrees, if start was 30, new is 130, 100, 30 new is -100, -130?
+	// if(isDraggingVolume)
+	// {
+	// 	if(volumeInstrument == 'guitar') cursorImage.style.transform = 'rotate('+guitarRotation+'deg)';
+	// 	if(volumeInstrument == 'keyboard') cursorImage.style.transform = 'rotate('+keyboardRotation+'deg)';
+	// }
+	cursorImage.style.transform = 'rotate('+currentRotation+'deg)';
+
 	refreshVolumeKnobs();
 }
 
@@ -1162,6 +1177,76 @@ function refreshVolumeKnobs()
 {
 	let guitarRotation = guitarVolume/0.2*260-130;
 	document.querySelector('#knobTop').style.transform = 'rotate('+guitarRotation+'deg)';
+	let keyboardRotation = pianoVolume*260-130;
+	document.querySelector('#keyVol').style.transform = 'rotate('+keyboardRotation+'deg)';
+
+}
+
+function cursorToPinchHand()
+{
+	cursorImage.src = "images/pinchCursor.png";
+	//
+	// cursorImage.style.left = ;
+}
+
+function cursorToNormal()
+{
+	if(!isDraggingVolume)
+	{
+		cursorImage.src = "images/cursor.png";
+	}
+}
+
+
+function addVolumeEventSquares()
+{
+	//get all knobs
+	let allKnobs = document.querySelectorAll('.knob');
+	//make squares triple width, above knobs
+	allKnobs.forEach((knob) =>
+	{
+		let eventDiv = document.createElement('DIV');
+		// eventDiv.style.backgroundColor = 'gray';
+		eventDiv.style.position = 'absolute';
+		eventDiv.style.zIndex = '10';
+		let knobRect = knob.getBoundingClientRect();
+		let parentLeft = knob.parentNode.getBoundingClientRect().left;
+		let parentTop = knob.parentNode.getBoundingClientRect().top;
+		let eventWidth = knobRect.width;
+		let eventHeight =	knobRect.height;
+		// let eventHeight =	0.02*windowWidth;
+		eventDiv.style.width = eventWidth+'px';
+		eventDiv.style.height = eventHeight+'px'; //needs to be based on cursor size
+		eventDiv.style.top = knobRect.top-parentTop-0.8*eventHeight+'px';
+		eventDiv.style.left = knobRect.left+(0.5*knobRect.width)-(0.1*eventWidth)-parentLeft+'px';
+		// onmousedown="startVolumeDrag('keyboard')"
+		// onmouseenter='cursorToPinchHand()'
+		// onmouseleave='cursorToNormal()'
+		let instrumentId;
+		if(knob.parentNode.id.includes('guitar')) instrumentId = 'guitar';
+		if(knob.parentNode.id.includes('keyboard')) instrumentId = 'keyboard';
+
+		eventDiv.onmousedown = (event) => startVolumeDrag(instrumentId);
+
+		// eventDiv.onmousedown = function(event)
+		// {
+		// 	startVolumeDrag(instrumentId);
+		// }
+		eventDiv.onmouseenter = function(event)
+		{
+			cursorToPinchHand();
+		}
+		eventDiv.onmouseleave = function(event)
+		{
+			if(!isDraggingVolume)
+			{
+				cursorToNormal();
+			}
+		}
+
+		knob.parentNode.appendChild(eventDiv);
+	});
+	//add event listeners to these
 }
 
 //shape E, bar 0, string1
@@ -1382,8 +1467,8 @@ function buildKeyboard(numKeys)
 	let minWidth = 1.06*boardHeight;
 	let keyWidth = (0.24*boardHeight);
 	let addedWidth = (numKeys-3)*keyWidth;
-	keyboardDiv.style.width = (minWidth+addedWidth)/windowWidth*100+0.2*heightInVw+'vw';
-	keyboardMid.style.width = (numKeys-3+0.5)*keyWidth/windowWidth*100+'vw';//should take
+	keyboardDiv.style.width = (minWidth+addedWidth+keyWidth)/windowWidth*100+0.2*heightInVw+'vw';
+	keyboardMid.style.width = (numKeys-3+1)*keyWidth/windowWidth*100+'vw';//should take
 	//insert another middle portion, or increase width
 	//add x white keys, spaced @x%, add appropriate classes
 	for(let i = 0; i < numKeys; i++)
@@ -1694,7 +1779,7 @@ function updateCursorImage(event)
 	let adjustedLeft = event.clientX-0.35*pixelWidth;
 
 	let adjustedTop = event.clientY;
-	//TODO: if(leftMouseDown) move whole image up a little
+	//TODO: if(leftMouseDown) move whole image up a little to match cursor y
 	if(leftMouseDown)
 	{
 
@@ -1710,13 +1795,17 @@ function updateCursorImage(event)
 document.onmousemove = function(event)
 {
 	//get x and y, update cursor location
+	event.preventDefault();
 	mouseX = event.clientX;
 	mouseY = event.clientY;
-	updateCursorImage(event);
 	if(isDraggingVolume)
 	{
 		let distanceMoved = volumeDragStart - mouseY;
 		moveVolumeKnob(distanceMoved);
+	}
+	else
+	{
+		updateCursorImage(event); //keeps image with cursor
 	}
 };
 
@@ -2194,13 +2283,18 @@ function clearLoopTimers()
 
 document.onmousedown = function(evt)
 {
+	leftMouseDown = true;
+	// cursorImage.src = "images/cursorDown.png";
 
-		leftMouseDown = true;
+	if(evt.preventDefault) evt.preventDefault();
+
+	if(!isDraggingVolume)
+	{
 		cursorImage.src = "images/cursorDown.png";
+	}
 	if(evt.which == 1)
 	{
-
-			// leftMouseDown = true;
+		// leftMouseDown = true;
 		// cursorImage.src = "cursorDown.png";
 	}
 }
@@ -2209,6 +2303,8 @@ document.onmouseup = function(evt)
 {
 	leftMouseDown = false;
 	cursorImage.src = "images/cursor.png";
+	cursorImage.style.transform = 'rotate(0deg)';
+
 	if(isDraggingVolume)
 	{
 		isDraggingVolume = false;

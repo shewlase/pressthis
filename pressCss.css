@@ -159,6 +159,11 @@ p
 	transition: width 1s ease;
 }
 
+#keyboardLeft
+{
+  z-index: 1;
+}
+
 #keyboardRight
 {
   left:-3vw;
@@ -178,6 +183,7 @@ p
 	position:absolute;
 	/* width: 13%; */
 	height: 52%;
+  z-index: 2;
 }
 
 .blackKey, .blackKeyBg
@@ -185,6 +191,7 @@ p
 	position:absolute;
 	/* width: 11.5%; */
 	height: 42%;
+  z-index: 2;
 }
 
 .blackKey
@@ -292,11 +299,25 @@ p
   top:0;
 }
 
+/* guitar */
 #knobTop
 {
-  width: 7%;
+  width: 5%;
   right: 5%;
   bottom: 15%;
+}
+
+#keyVol
+{
+width: 3.5%;
+left: 2.35%;
+z-index: 3;
+top: 9%;
+}
+
+.knob
+{
+
 }
 
 #fretHand
@@ -414,6 +435,7 @@ p
  pointer-events: none;
  user-select: none;
  display: block;
+ z-index: 5;
 }
 
 .hidden

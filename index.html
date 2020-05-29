@@ -24,10 +24,12 @@
 				<!-- <div id='keyboardMid'></div> -->
 				<img id='keyboardMid' src='images/keyboardMid.png'>
 				<img id='keyboardRight' draggable='false' src='images/keyboardRight.png'>
+				<img id='keyVol' class='knob' title='volume' src="images/knobTop.png">
+
 			</div>
 
 			<div id="guitarDiv" onmousedown='guitarClicked(event)'>
-				<img id="guitarMain" src="images/guitar.png" >
+				<img id="guitarMain" src="images/guitar.png">
 				<!-- should dynamically create them, could set dynamic string amount -->
 				<!-- <div id="sb0" class="betweenString" onmouseenter="checkStringTap(event)"></div> -->
 				<div id="sb1" class="betweenString" onmouseenter="checkStringTap(event)"></div>
@@ -39,7 +41,7 @@
 				<div id="string3" draggable="false"  onmouseenter='stringTap(3)'></div>
 				<div id="string4" draggable="false" onmouseenter='stringTap(4)'></div> -->
 				<img id="fretHand" draggable='false' src="images/fretUp.png">
-				<img id='knobTop' src="images/knobTop.png" onmousedown="startVolumeDrag('guitar')">
+				<img id='knobTop' class='knob' src="images/knobTop.png">
 			</div>
 			<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
 			<div id="hotkeyToggle" class="toggle toggleDisabled" onmousedown="togglePressed('hotkeys', event)"><p>Hotkeys</p></div>
