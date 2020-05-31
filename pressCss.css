@@ -299,12 +299,21 @@ p
   top:0;
 }
 
+#stringHandMain, #stringThumb, #stringIndex, #stringMiddle, #stringRing
+{
+right: 5%;
+width: 16%;
+top: 15%;
+z-index: 1;
+pointer-events: none;
+}
+
 /* guitar */
 #knobTop
 {
-  width: 5%;
-  right: 5%;
-  bottom: 15%;
+  width: 3.8%;
+  right: 8.1%;
+  bottom: 20.8%;
 }
 
 #keyVol

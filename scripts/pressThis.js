@@ -48,7 +48,9 @@ let multipleGuide, songTitle, progressBar;//could make it quickDiv
 //images not used initially but change with user events
 let animationImages = ["images/whiteKeyHighlighted.png", "images/blackKeyHighlighted.png",
 		"images/cursorDown.png", "images/fretUp.png", "images/fretE.png", "images/fretA.png", "images/trackButtonRecording.png",
-		 "images/trackButtonPlaying.png", "images/trackButtonEmpty.png"];
+		 "images/trackButtonPlaying.png", "images/trackButtonEmpty.png", "images/pinchCursor.png",
+	 "images/stringThumbDown.png", "images/stringIndexDown.png", "images/stringMiddleDown.png",
+ 	"images/stringRingDown.png"];
 var preLoaded;
 //Studio/StageX
 
@@ -1039,6 +1041,43 @@ function stringTap(stringNumber, isStrum)
 	if(leftMouseDown || isStrum)
 	{
 		tap(soundName, stringNumber);
+		animateStringFinger(stringNumber);
+	}
+}
+
+function animateStringFinger(stringNumber)
+{
+	if(stringNumber == 1 || stringNumber == 2)
+	{
+		document.querySelector('#stringThumb').src = 'images/stringThumbDown.png';
+		setTimeout(function()
+		{
+			document.querySelector('#stringThumb').src = 'images/stringThumb.png';
+		}, 200);
+	}
+	else if(stringNumber == 3)
+	{
+		document.querySelector('#stringIndex').src = 'images/stringIndexDown.png';
+		setTimeout(function()
+		{
+			document.querySelector('#stringIndex').src = 'images/stringIndex.png';
+		}, 200);
+	}
+	else if(stringNumber == 4)
+	{
+		document.querySelector('#stringMiddle').src = 'images/stringMiddleDown.png';
+		setTimeout(function()
+		{
+			document.querySelector('#stringMiddle').src = 'images/stringMiddle.png';
+		}, 200);
+	}
+	else if(stringNumber == 5)
+	{
+		document.querySelector('#stringRing').src = 'images/stringRingDown.png';
+		setTimeout(function()
+		{
+			document.querySelector('#stringRing').src = 'images/stringRing.png';
+		}, 200);
 	}
 }
 
@@ -1047,15 +1086,18 @@ function checkStringTap(event)
 {
 	let stringNumber = parseInt(event.target.id.charAt(2));
 	let enterDirection = checkEnterDirection(event);
-	if(enterDirection == "bottom" && stringNumber != 4)
+	if(leftMouseDown)
 	{
-		// stringNumber++;
-		stringTap(stringNumber+1);//remove +1 when string 0 is here
-	}
-	else if(enterDirection == "top" && stringNumber != 1)//will be 0
-	{
-		stringNumber--;
-		stringTap(stringNumber+1);
+		if(enterDirection == "bottom" && stringNumber != 4)
+		{
+			// stringNumber++;
+			stringTap(stringNumber+1);//remove +1 when string 0 is here
+		}
+		else if(enterDirection == "top" && stringNumber != 1)//will be 0
+		{
+			stringNumber--;
+			stringTap(stringNumber+1);
+		}
 	}
 }
 
@@ -1094,7 +1136,7 @@ function getSoundFromStringId(stringNumber)
 	return soundName = "g"+stringNumber+fingerFret; //need getSoundFromStringId?
 }
 //up 1, down -1
-//TODO: speed/timeBetweenStrings, strings/range
+//TODO: zstrings/range
 function strum(direction, stringDelay)
 {
 	//tap all strings in order
@@ -1113,11 +1155,18 @@ function strum(direction, stringDelay)
 			stringTap(i, true);
 		}, pickDelay);
 		pickDelay += stringDelay;
-		if(direction < 0 && i < 4)
+		if(direction < 0 && i < 3)
 		{
 			break;
 		}
 	}
+	// setTimeout(function()
+	// {
+	// 	document.querySelector('#stringThumb').src = 'images/stringThumb.png';
+	// 	document.querySelector('#stringIndex').src = 'images/stringIndex.png';
+	// 	document.querySelector('#stringMiddle').src = 'images/stringMiddle.png';
+	// 	document.querySelector('#stringRing').src = 'images/stringRing.png';
+	// }, 200);
 }
 
 function getVolumeFromSoundName(soundName)
@@ -1849,6 +1898,7 @@ function loadImages()
 	imageList = document.getElementsByTagName("img");
 
 	let allSrc = animationImages;
+
 	for(var i=0; i<imageList.length; i++)
 	{
 		allSrc.push(imageList[i].src);
@@ -2633,6 +2683,19 @@ document.onkeyup = function(evt)
 			case 67: //C
 				shape = eShape;
 				fretKeyUp();
+				break;
+
+			case 102: //PAD6
+				document.querySelector('#stringRing').src = 'images/stringRing.png';
+				break;
+			case 101: //PAD5
+				document.querySelector('#stringMiddle').src = 'images/stringMiddle.png';
+				break;
+			case 100: //PAD4
+				document.querySelector('#stringIndex').src = 'images/stringIndex.png';
+				break;
+			case 37: //LEFT
+				document.querySelector('#stringThumb').src = 'images/stringThumb.png';
 				break;
 		}
 
