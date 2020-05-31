@@ -1765,20 +1765,15 @@ function animate(soundName, delay)
 			if(soundName.charAt(1) != 'b')//white keys
 			{
 				to = 44;
-				from = 40;
 				if(!threeToShow.includes(soundName))//should be currentRiff[riffProgress+123  etc?]
 				{
 					element.src = "images/whiteKeyHighlighted.png";
 					setTimeout(function()
 					{
-						 // element.src = "images/whiteKey.png";
-						 // if(riffProgress != 0)
-						 // {
 						 if(stage == QUICK)
 						 {
 							 updateThreeKeys();
 						 }
-						 // }
 					}, 200);
 				}
 
@@ -1786,7 +1781,6 @@ function animate(soundName, delay)
 			else//black keys
 			{
 				to = 39;
-				from = 35;
 				if(!threeToShow.includes(soundName))
 				{
 					element.src = "images/blackKeyHighlighted.png";
@@ -1801,10 +1795,10 @@ function animate(soundName, delay)
 				}
 			}
 			element.style.top = to+'%';
-			setTimeout(function()
-			{
-				element.style.top = from+'%';
-			}, 100);
+			// setTimeout(function()
+			// {
+			// 	element.style.top = from+'%';
+			// }, 100);
 		}, delay);
 	}
 }
@@ -2406,15 +2400,21 @@ function checkStopSound(evt)
 
 function resetPianoKey(soundName)
 {
+	let from;
+	let element = document.getElementById(soundName);
 	if(soundName.charAt(0) == 'p')
 	{
 		if(soundName.charAt(1) == 'b')//white keys
 		{
-			document.getElementById(soundName).src = "images/blackKey.png";
+			from = 35;
+			element.src = "images/blackKey.png";
+			element.style.top = from+'%';
 		}
 		else
 		{
-			document.getElementById(soundName).src = "images/whiteKey.png";
+			from = 40;
+			element.src = "images/whiteKey.png";
+			element.style.top = from+'%';
 		}
 	}
 }
