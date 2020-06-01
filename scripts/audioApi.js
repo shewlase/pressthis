@@ -274,7 +274,7 @@ function transpose(direction)
 
 //delay is in milliseconds
 // function playSound(buffer, delay, stringNumber, soundName)
-function playSound(soundName, delay, stringNumber)
+function playSound(soundName, delay, duration, stringNumber)
 {
 	// buffer = getBufferByName(soundName);
 	buffer = allBuffers[soundName];
@@ -323,6 +323,14 @@ function playSound(soundName, delay, stringNumber)
 
 	activeSounds[soundName] = [source, gainNode];
 
+	//stop the sound if duration is null
+	if(duration != null)
+	{
+    console.log(soundName + ' stopped at '+ delay + duration);
+    gainNode.gain.setTargetAtTime(0.0, context.currentTime+(delay+duration)/1000, 0.1);
+	}
+	// stopSound()
+
 	//add to array (to stop if needed), remove when finished playing
 	// activeSounds.push(source);
 	// setTimeout(function()
@@ -351,47 +359,16 @@ function toggleOggRecording()
 	}
 }
 
-
-//e.g. guitar fret stop held down, keyboard key released
-function playStoppableSound(buffer, delay, arrayId)
-{
-	var source = context.createBufferSource();
-	let adjustedDelay = 0;
-	source.buffer = buffer;
-	source.connect(context.destination);
-
-	if(delay != 0)
-	{
-		adjustedDelay = context.currentTime+delay/1000;
-	}
-	source.start(adjustedDelay);
-	if(canBeStopped)
-	{
-		stoppableSounds.push(source);
-	}
-}
-
-//only applies to sounds that cannot be duplicated
-// e.g the same piano key, the same guitar string
-//  need once played again, delete last source
-// function stopSoundApi(stringNumber, delay)
-// {
-// 	//get source from activeSounds from soundName
-// 	let bufferSource =  stringSources[stringNumber][0];
-// 	let bufferGainNode =  stringSources[stringNumber][1];
-// 	// setTimeout(function()
-// 	// {
-// 	// 	bufferGainNode.gain.value = 0.0;
-// 	// }, delay);
-// 	bufferGainNode.gain.setTargetAtTime(0.0, context.currentTime, 0.1);
-//
-// 	// stopSound(bufferSource, delay);
-// }
-
 function stopSoundApi(soundName, delay)
 {
 	//need to delete after? doesnt take much space
-	activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime+delay/1000, 0.1);
+	console.log(soundName + ' stopped');
+	let activeGainNode = 	activeSounds[soundName];
+	if(activeGainNode != null) activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime+delay/1000, 0.1);
+	// setTimeout(function()
+	// {
+	// 	activeSounds[soundName] = null; //destroys any future repeated notes
+	// }, 100);
 }
 
 // function stopSound(bufferSource, delay)

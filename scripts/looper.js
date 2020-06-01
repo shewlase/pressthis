@@ -58,7 +58,7 @@ class Track
       let duration = note.duration;
       let soundName = note.soundName;
       // pianoKeyPressed(soundName, delay);
-      animateAndPlaySound(soundName, delay, -1);//note needs to store string/isguitar
+      animateAndPlaySound(soundName, delay, duration, -1);//note needs to store string/isguitar
 
       // stopSoundApi(soundName, duration);
       if(testingLocal)
@@ -69,7 +69,7 @@ class Track
         }, delay+duration)
         stopSoundLocal(soundName, delay+duration);
       }
-      else
+      else //playsound handles duration, not needed
       {
         setTimeout(function()
         {
@@ -90,8 +90,17 @@ class Track
       //needs to minus all previous times i.e. first note = 0
       let delay = delayInMs+queueDelay;
       let soundName = note.soundName;
+      let duration = note.duration;
       // pianoKeyPressed(soundName, delay);
-      animateAndPlaySound(soundName, delay, -1);//note needs to store string/isguitar
+      animateAndPlaySound(soundName, delay, duration, -1);//note needs to store string/isguitar
+      if(testingLocal)
+      {
+        setTimeout(function()
+        {
+          resetPianoKey(soundName);
+        }, delay+duration)
+        stopSoundLocal(soundName, delay+duration);
+      }
     }
   }
 
@@ -118,6 +127,7 @@ class Note
     // this.timeFromStart = timeFromStart;
     this.beatsFromStart = beatsFromStart;
     this.duration = duration;
+    if(duration == null) this.duration = 200;
   }
 }
 

@@ -26,6 +26,7 @@ let phaseNumber = 0;
 
 let whiteKeyNum = 0;
 let blackKeyNum = 0;
+let highlightKeys = true; //change colour on keypress
 
 let songProgress = 0;
 let pianoVolume = 1.0;
@@ -188,7 +189,7 @@ function init()
   initS1Loops();
 
 	setStage(stage);
-	buildKeyboard(15);
+	// buildKeyboard(15);
 	addVolumeEventSquares();
 	// initStageTwo();
 	loadImages();
@@ -246,8 +247,10 @@ function initQuick()
 	// drumDiv.style.top = "2vw";
 	keyboardDiv.style.top = "9vw";
 	keyboardDiv.style.left = "20vw";
-	keyboardDiv.style.height = "40vw";
-
+	keyboardDiv.style.height = "25vw"; //need to rebuild, 8 keys
+	deleteAllKeyElements();
+	buildKeyboard(8);
+	addVolumeEventSquares();
 	// keyboardDiv.style.width = "60vw";
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "none";
@@ -314,7 +317,8 @@ function createOneRandomPhase(noteCount)
 		if(i!=0) randomBeats += Math.ceil(Math.random()*4)*0.5+0.5;
 		// let beatsDif = Math.ceil(Math.random()*4)*0.5+0.5;
 		// let beatsFromStart = i;//if 1 beat increase
-		randomTrack.addNote(randomNoteId, randomBeats);
+		//random duration too?
+		randomTrack.addNote(randomNoteId, randomBeats, 300);
 	}
 	randomTrack.queueAllNotes(0);
 	// loopRandomTrack(randomTrack, 0);
@@ -326,7 +330,7 @@ function createCloseRandomPhase(noteCount)
 	randomTrack.title = 'Randomed Close Phase';
 	randomBeats = 0;
 	let lastNotePos = Math.floor(Math.random()*pentaPianoNotes.length);
-	randomTrack.addNote(pentaPianoNotes[lastNotePos], 0);
+	randomTrack.addNote(pentaPianoNotes[lastNotePos], 0, 300);
 	for(let i = 1; i < noteCount; i++)
 	{
 		// -1, 0, 1  0 1 2
@@ -350,7 +354,7 @@ function createCloseRandomPhase(noteCount)
 		//between 0.5 and 2??
 		if(i!=0) randomBeats += Math.ceil(Math.random()*2)*+0.5;
 
-		randomTrack.addNote(thisNote, randomBeats);
+		randomTrack.addNote(thisNote, randomBeats, 300);
 		lastNotePos = randomClosePos;
 	}
 	// loopRandomTrack(randomTrack, 0);
@@ -537,7 +541,7 @@ function createRandomPhases()
 	{
 		let randomNoteId = Math.floor(Math.random()*allPianoNotes.length);
 		let beatsFromStart = i;
-		randomTrack.addNote(randomNoteId, i);
+		randomTrack.addNote(randomNoteId, i, 300);
 	}
 
 	for(let i = 0; i < allPianoNotes.length; i++)
@@ -607,8 +611,10 @@ function initStudio()
 	keyboardDiv.style.top = "6vw";
 	keyboardDiv.style.left = "37vw";
 	keyboardDiv.style.height = "12vw";
-
-	guitarDiv.style.display = 'block';
+	deleteAllKeyElements();
+	buildKeyboard(15);
+	addVolumeEventSquares();
+	// guitarDiv.style.display = 'block';
 
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "block";
@@ -640,9 +646,13 @@ function initStageOne()
 	drumDiv.style.width = "100vw";
 	drumDiv.style.height = "100vh";
 	drumDiv.style.top = "0";
+
 	keyboardDiv.style.top = "100vw";
 	keyboardDiv.style.left = "28vw";
-	keyboardDiv.style.width = "60vw";
+	keyboardDiv.style.height = "25vw";
+	deleteAllKeyElements();
+	buildKeyboard(3);
+	addVolumeEventSquares();
 
 	cursorImage.style.width = "10vw"
 	studioDiv.style.display = "none";
@@ -657,8 +667,8 @@ function initS1Loops()
 	for(let i = 0; i < drumNotes.length; i++)
 	{
 		// let timeFromStart = i * beatTime;
-		drumTrackS1.addNote(drumNotes[i], i);
-		pianoTrackS1.addNote(pianoNotes[i], i);
+		drumTrackS1.addNote(drumNotes[i], i, 300);
+		pianoTrackS1.addNote(pianoNotes[i], i, 300);
 	}
 }
 
@@ -667,27 +677,35 @@ function addNotesToTrack(track, noteList)
 	for(let i = 0; i < noteList.length; i++)
 	{
 		// let timeFromStart = i * beatTime;//notes need times ['p1', 1.5]
-		track.addNote(noteList[i], i);
+		track.addNote(noteList[i], i, 300); //duration = noteList[i][1]
 	}
 }
 
 //TODO: if string playing, restart (api create new source)
-function animateAndPlaySound(soundName, delay, stringNumber)
+function animateAndPlaySound(soundName, delay, duration, stringNumber)
 {
 	//always playSound/animate
-
 	animate(soundName, delay);
+	
+	if(duration != null)
+	{
+		setTimeout(function()
+		{
+			unAnimate(soundName);
+		}, delay + duration);
+	}
+
 	if(testingLocal)
 	{
 		setTimeout(function()
 		{
-			playSoundLocal(soundName);
+			playSoundLocal(soundName, duration);
 		},delay);
 	}
 	else
 	{
 		// playSound(getBufferByName(soundName), delay, stringNumber, soundName);
-		playSound(soundName, delay, stringNumber);
+		playSound(soundName, delay, duration, stringNumber);
 	}
 }
 //Run everytime a letter is tapped/clicked
@@ -704,11 +722,11 @@ function tap(soundName, stringNumber)
 	if(!testingLocal && !checkAudioInit())
 	{
 		initApi();
-		animateAndPlaySound(soundName, loadSoundDelay, string);
+		animateAndPlaySound(soundName, loadSoundDelay, null, string);
 	}
 	else
 	{
-		animateAndPlaySound(soundName, 0, string);
+		animateAndPlaySound(soundName, 0, null, string);
 	}
 
 	if(stage == STUDIO)//should be ==STAGE -> stageXTap(soundName)
@@ -749,6 +767,13 @@ function playQuickTap(soundName)
 	{
 		riffProgress++;
 		updateProgressBar();
+		// if(riffProgress == 0)
+		// quickTapCount++;
+		if(isFirstTap)
+		{
+			isFirstTap = false;
+			startTimer();
+		}
 	}
 	else
 	{
@@ -756,13 +781,7 @@ function playQuickTap(soundName)
 		// helpText.innerHTML = wrongNoteCount;
 	}
 
-	// if(riffProgress == 0)
-	// quickTapCount++;
-	if(isFirstTap)
-	{
-		isFirstTap = false;
-		startTimer();
-	}
+
 
 	if(riffProgress == currentRiff.notes.length)
 	{
@@ -834,16 +853,16 @@ function unhighlightPiano()
 // function quickModeTap(soundName)
 function learnQuickTap(soundName)
 {
-	isFirstTap = (riffProgress == phaseStart);
-	//if first tap of phase, start timer
-	if(isFirstTap) startTimer();
+
 	riffProgress++;
 	// currentNote = randomTrack.notes[quickTapCount-1].soundName;
 	currentNote = currentRiff.notes[riffProgress-1].soundName;
 	let isCorrectTap = (soundName == currentNote);
 	if(isCorrectTap)
 	{
-
+		isFirstTap = (riffProgress == phaseStart);
+		//if first tap of phase, start timer
+		if(isFirstTap) startTimer();
 		// console.log('correct');
 		// if(quickTapCount == randomTrack.notes.length)
 		// if(riffProgress == (phasePos+1)*phaseSize)//end of phase
@@ -1007,7 +1026,7 @@ function stage1Tap(soundName)
 
 				keyboardDiv.style.top = "11vw";
 				keyboardDiv.style.left = "58vw";
-				keyboardDiv.style.width = "20vw";
+				// keyboardDiv.style.height = "vw";
 
 				document.getElementById("studioTrain").style.display = "block";
 				// keyboardDiv.style.transform = "rotate(15deg)";
@@ -1249,6 +1268,8 @@ function cursorToNormal()
 
 function addVolumeEventSquares()
 {
+	//delete previous ones
+	document.querySelectorAll('.eventDiv').forEach((div) => div.parentNode.removeChild(div));
 	//get all knobs
 	let allKnobs = document.querySelectorAll('.knob');
 	//make squares triple width, above knobs
@@ -1258,6 +1279,7 @@ function addVolumeEventSquares()
 		// eventDiv.style.backgroundColor = 'gray';
 		eventDiv.style.position = 'absolute';
 		eventDiv.style.zIndex = '10';
+		eventDiv.classList.add('eventDiv');
 		let knobRect = knob.getBoundingClientRect();
 		let parentLeft = knob.parentNode.getBoundingClientRect().left;
 		let parentTop = knob.parentNode.getBoundingClientRect().top;
@@ -1384,7 +1406,14 @@ function playPhase(phaseId, phaseDelay)
 	{
 		let delay = i*beatTime;
 		let soundName = phaseNotes[i];
-		animateAndPlaySound(soundName, phaseDelay+delay);
+		animateAndPlaySound(soundName, phaseDelay+delay, 200); //need note times in array
+		if(testingLocal)
+		{
+			// setTimeout(function()
+			// {
+			// 	stopSound(soundName);
+			// }, 250+phaseDelay+delay);
+		}
 	}
 }
 
@@ -1399,7 +1428,7 @@ function loopPhase(phaseId, delayLoop)
 		for(let notePosition = 0; notePosition < phaseNotes.length; notePosition++)
 		{
 			let delay = notePosition*beatTime;
-			animateAndPlaySound(phaseNotes[notePosition], delay+delayLoop);
+			animateAndPlaySound(phaseNotes[notePosition], delay+delayLoop, 200);
 			// playSound(getBufferByName(notesInOrder[notePosition]), timeFromLoopStart);
 		}
 	},phaseNotes.length*beatTime+beatTime-1);//add one beat (notTiming)
@@ -1499,12 +1528,12 @@ function moveLettersToBack()
 
 // }
 
-//will eventually take key#, boardBg will stretch to fit all
-// function buildKeyboard()
+//maybe should take keyboard height
 function buildKeyboard(numKeys)
 {
 	whiteKeyNum = numKeys;
 	allPianoNotes = [];
+	blackKeys = [];
 	// numKeys = 5;
 	// keyboardRight.style.left = (numKeys-3)*22-2+'%';
 	//get keyboard height
@@ -1518,6 +1547,8 @@ function buildKeyboard(numKeys)
 	let addedWidth = (numKeys-3)*keyWidth;
 	keyboardDiv.style.width = (minWidth+addedWidth+keyWidth)/windowWidth*100+0.2*heightInVw+'vw';
 	keyboardMid.style.width = (numKeys-3+1)*keyWidth/windowWidth*100+'vw';//should take
+	//position volume knob, pecentage of height
+	document.querySelector('#keyVol').style.left = 0.1*boardHeight+'px';
 	//insert another middle portion, or increase width
 	//add x white keys, spaced @x%, add appropriate classes
 	for(let i = 0; i < numKeys; i++)
@@ -1538,8 +1569,9 @@ function buildKeyboard(numKeys)
 			// stopSoundLocal(keyId);
 			stopSound(keyId);
 			saveNoteToTrack(keyId);
+			// resetPianoKey(keyId);
 
-			document.getElementById(keyId).src = "images/whiteKey.png";
+			// document.getElementById(keyId).src = "images/whiteKey.png";
 		}
 		keyElement.onmouseenter = function(event)
 		{
@@ -1556,8 +1588,8 @@ function buildKeyboard(numKeys)
 			{
 				stopSound(keyId);
 				saveNoteToTrack(keyId);
-
-				document.getElementById(keyId).src = "images/whiteKey.png";
+				// resetPianoKey(keyId);
+				// document.getElementById(keyId).src = "images/whiteKey.png";
 			}
 		}
 
@@ -1598,8 +1630,9 @@ function buildKeyboard(numKeys)
 				// stopSoundLocal(keyId);
 				stopSound(blackKeyId);
 				saveNoteToTrack(blackKeyId);
+				// resetPianoKey(blackKeyId);
 
-				blackKeyElement.src = "images/blackKey.png";
+				// blackKeyElement.src = "images/blackKey.png";
 			}
 			blackKeyElement.onmouseenter = function(event)
 			{
@@ -1616,8 +1649,9 @@ function buildKeyboard(numKeys)
 				{
 					stopSound(blackKeyId);
 					saveNoteToTrack(blackKeyId);
+					// resetPianoKey(blackKeyId);
 
-					blackKeyElement.src = "images/blackKey.png";
+					// blackKeyElement.src = "images/blackKey.png";
 				}
 			}
 			let blackKeyBg = blackKeyElement.cloneNode(true);
@@ -1652,6 +1686,13 @@ function buildKeyboard(numKeys)
 		// document.getElementById('keyboardDiv').appendChild(blackKeyBg);
 		// document.getElementById('keyboardDiv').appendChild(blackKeyElement);
 	}
+}
+
+function deleteAllKeyElements()
+{
+	//whiteKey, whiteKeyBg, blackKey, blackKeyBg
+	let allKeys = document.querySelectorAll('.whiteKey, .whiteKeyBg, .blackKey, .blackKeyBg');
+	allKeys.forEach((key) => keyboardDiv.removeChild(key));
 }
 
 function wrongNote()
@@ -1767,7 +1808,7 @@ function animate(soundName, delay)
 				to = 44;
 				if(!threeToShow.includes(soundName))//should be currentRiff[riffProgress+123  etc?]
 				{
-					element.src = "images/whiteKeyHighlighted.png";
+					if(highlightKeys) element.src = "images/whiteKeyHighlighted.png";
 					setTimeout(function()
 					{
 						 if(stage == QUICK)
@@ -1776,14 +1817,13 @@ function animate(soundName, delay)
 						 }
 					}, 200);
 				}
-
 			}
 			else//black keys
 			{
 				to = 39;
 				if(!threeToShow.includes(soundName))
 				{
-					element.src = "images/blackKeyHighlighted.png";
+					if(highlightKeys) element.src = "images/blackKeyHighlighted.png";
 					setTimeout(function()
 					{
 						// element.src = "images/blackKey.png";
@@ -1909,17 +1949,26 @@ function loadImages()
 }
 
 //Plays audio based on sound string
-function playSoundLocal(soundName)
+function playSoundLocal(soundName, duration)
 {
 	var audioID = soundName+"Audio";
 	let audioElement = document.getElementById(audioID);
 	audioElement.volume = getVolumeFromSoundName(soundName);
 	audioElement.currentTime = 0;
 	audioElement.play();
+	if(duration != null)
+	{
+		setTimeout(function()
+		{
+			stopSoundLocal(soundName);
+			unAnimate(soundName);
+		}, duration);
+	}
 }
 
 function stopSound(soundName)
 {
+	// console.log(soundName+' stopped.');
 	if(testingLocal)
 	{
 		stopSoundLocal(soundName);
@@ -1927,6 +1976,17 @@ function stopSound(soundName)
 	else
 	{
 		stopSoundApi(soundName, 0);
+	}
+	//untap animations
+	unAnimate(soundName);
+}
+
+//just piano for now
+function unAnimate(soundName)
+{
+	if(soundName.charAt(0) == 'p')
+	{
+		resetPianoKey(soundName);
 	}
 }
 
@@ -2386,6 +2446,7 @@ function hotkeyTap(evt)
 }
 
 //on key up
+//need check for drums to not stop sound if(!allDrums.contains())
 function checkStopSound(evt)
 {
 	let soundName = keyCodeToSoundname(evt);
@@ -2394,7 +2455,7 @@ function checkStopSound(evt)
 		stopSound(soundName);
 		saveNoteToTrack(soundName);
 		//only if p, need others for
-		resetPianoKey(soundName);
+		// resetPianoKey(soundName);
 	}
 }
 
@@ -2407,13 +2468,13 @@ function resetPianoKey(soundName)
 		if(soundName.charAt(1) == 'b')//white keys
 		{
 			from = 35;
-			element.src = "images/blackKey.png";
+			if(highlightKeys) element.src = "images/blackKey.png";
 			element.style.top = from+'%';
 		}
 		else
 		{
 			from = 40;
-			element.src = "images/whiteKey.png";
+			if(highlightKeys) element.src = "images/whiteKey.png";
 			element.style.top = from+'%';
 		}
 	}
@@ -2538,16 +2599,17 @@ document.onkeydown = function(evt) {
 			break;
 
 			case 97: //PAD1
-				toggleOggRecording();
 				// stringTap(2, true);
+				setStage(STUDIO);
 				break;
 			case 98: //PAD2
-				playLoopBuffer();
 				// stringTap(3, true);
+				setStage(QUICK);
 				break;
-			// case 99: //PAD3
-			// 	stringTap(4, true);
-			// 	break;
+			case 99: //PAD3
+				// stringTap(4, true);
+				setStage(INTRO);
+				break;
 			case 102: //PAD6
 				stringTap(5, true);
 				break;
@@ -2622,10 +2684,10 @@ document.onkeydown = function(evt) {
 			// loopPhase(8);
 			// pianoTrackS1.queueAllNotes(0);
 			// setTempo(parseInt(document.getElementById("tempoInput").value));
-			clearInterval(loopTimers[0]);
-			loopTimers.shift();
-			createCloseRandomPhase(9);
-			loopRandomTrack();
+// 				clearInterval(loopTimers[0]);
+// 				loopTimers.shift();
+// 				createCloseRandomPhase(9);
+// 				loopRandomTrack();
 			// createCloseRandomPhase(13);
 			break;
 		case 78: //N
@@ -2646,7 +2708,9 @@ document.onkeydown = function(evt) {
 				// strum(1);
 			break;
 		case 32: //SPACE
-			restartRiffs();
+		toggleOggRecording();
+			// playLoopBuffer();
+			// restartRiffs();
 			break;
 		case 38: //UP
 			// strum(-1, 10);
@@ -2699,4 +2763,10 @@ document.onkeyup = function(evt)
 				break;
 		}
 
+}
+
+//rebuild keyboard?
+window.onresize = function(evt)
+{
+	windowWidth = window.innerWidth;
 }

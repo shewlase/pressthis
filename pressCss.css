@@ -146,7 +146,7 @@ p
 	position: absolute;
 	/* height: 20vw; */
 	/* width: 60vw; */
-	transition: all 2s ease 0s;
+	/* transition: all 2s ease 0s; */
 	z-index: 2;
 }
 
@@ -318,7 +318,7 @@ pointer-events: none;
 
 #keyVol
 {
-width: 3.5%;
+  height: 15.8%;
 left: 2.35%;
 z-index: 3;
 top: 9%;
