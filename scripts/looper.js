@@ -254,7 +254,7 @@ function getNoteCount()
   return track.notes.length;
 }
 
-function setNoteDuration(soundName)
+function setNoteDuration(soundName)//shouldnt add note, just update the duration
 {
   let track = allTracks[trackRecording];
   let duration = new Date().getTime() - toAdd[soundName][1]; //need to be ms?

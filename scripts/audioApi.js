@@ -321,13 +321,28 @@ function playSound(soundName, delay, duration, stringNumber)
 		stringSources[stringNumber] = [source, gainNode];
 	}
 
-	activeSounds[soundName] = [source, gainNode];
+	//check if already exists, if so increment number
+
 
 	//stop the sound if duration is null
+	//  only recorded/queued notes (i.e. non player) notes will have duration
 	if(duration != null)
 	{
-    console.log(soundName + ' stopped at '+ delay + duration);
+    // console.log(soundName + ' stopped at '+ delay + duration);
+		//+1 at least for duration defined notes
+		let indexedSoundName = checkRepeat(soundName);
+		activeSounds[indexedSoundName] = [source, gainNode];
+
     gainNode.gain.setTargetAtTime(0.0, context.currentTime+(delay+duration)/1000, 0.1);
+		setTimeout(function()
+		{
+			// activeSounds.splice(activeSounds.indexOf(source), 1);
+			activeSounds[indexedSoundName] = null;
+		},delay+duration+200);
+	}
+	else
+	{
+		activeSounds[soundName] = [source, gainNode];
 	}
 	// stopSound()
 
@@ -337,6 +352,19 @@ function playSound(soundName, delay, duration, stringNumber)
 	// {
 	// 	activeSounds.splice(activeSounds.indexOf(source), 1);
 	// },buffer.duration*1000);
+}
+
+//only works for cpu played notes, really need seperate playSound or activeSound arrays
+function checkRepeat(soundName)
+{
+	let indexedSoundName = soundName;
+	let index = 1;
+	//if exists, add one to index
+	while(activeSounds[indexedSoundName+index] != null)
+	{
+		index++;
+	}
+	return indexedSoundName+index;
 }
 
 function readyToRecord()
@@ -362,7 +390,7 @@ function toggleOggRecording()
 function stopSoundApi(soundName, delay)
 {
 	//need to delete after? doesnt take much space
-	console.log(soundName + ' stopped');
+	// console.log(soundName + ' stopped');
 	let activeGainNode = 	activeSounds[soundName];
 	if(activeGainNode != null) activeSounds[soundName][1].gain.setTargetAtTime(0.0, context.currentTime+delay/1000, 0.1);
 	// setTimeout(function()
