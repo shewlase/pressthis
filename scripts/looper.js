@@ -69,13 +69,14 @@ class Track
         }, delay+duration)
         stopSoundLocal(soundName, delay+duration);
       }
-      else //playsound handles duration, not needed
+      else
       {
         setTimeout(function()
         {
           resetPianoKey(soundName);
         }, delay+duration)
-        stopSoundApi(soundName, delay+duration);
+        //playsound handles duration, not needed
+        // stopSoundApi(soundName, delay+duration);
       }
     }
   }
@@ -244,6 +245,8 @@ function recordTap(soundName)
     // currentlyHeldNotes.push(soundName);
     // currentlyHeldNotes.push(track.notes.length); //need index in track to edit duration
     // track.addNote(soundName, beatsFromStart);
+
+    //take index of added note instead, notes[index].duration = x
     toAdd[soundName] = [beatsFromStart, tapTime]
 	}
 }
