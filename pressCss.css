@@ -293,9 +293,9 @@ p
 {
   position: absolute;
   /* display: none; */
-  opacity: 0.1;
-  top: 40vh;
-  left: 10vw;
+  /* opacity: 0.1; */
+  /* top: 40vh; */
+  /* left: 10vw; */
   width: 80vw;
   height: 26vw;
   z-index: 4;

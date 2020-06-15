@@ -79,7 +79,7 @@ var notesAndPhases =
 ];
 
 let pentaPianoNotes = ['p1', 'p2', 'p3', 'p5', 'p6'];
-
+let allDrums = ['kick', 'hat', 'snare'];
 var noteCount = -1;
 var beatTime = 300;
 let loopTimer, loopTimers;
@@ -228,6 +228,8 @@ function initQuick()
 	multipleGuide.style.display = 'block';
 	progressBar.style.display = 'block';
 	drumDiv.style.display = "none";
+	guitarDiv.style.display = 'block';
+
 	//need tracks div?
 	recordButton1.style.display = 'none';
 	document.getElementById("trashTrack1").style.display = 'none';
@@ -607,6 +609,7 @@ function initStudio()
 	multipleGuide.style.display = 'none';
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
+	guitarDiv.style.display = 'block';
 	helpText.style.opacity = '0';
 
 
@@ -614,9 +617,7 @@ function initStudio()
 	// drumDiv.style.height = "40vh";
 	// drumDiv.style.left = "2vw";
 	// drumDiv.style.top = "2vw";
-	scaleAndPosition(drumDiv, 60, 30, 0.5);
-	// drumDiv.style.transform = "translate(65vw, 32vh) scale(0.4)";
-	drumDiv.style.display = "block";
+
 
 	// keyboardDiv.style.top = "6vw";
 	// keyboardDiv.style.left = "37vw";
@@ -626,8 +627,11 @@ function initStudio()
 	deleteAllKeyElements();
 	buildKeyboard(15);
 	addVolumeEventSquares();
-	scaleAndPosition(keyboardDiv, 8, 40, 0.5); //has to be after build keyboard
-
+	scaleAndPosition(keyboardDiv, 8, 20, 0.5); //has to be after build keyboard
+	scaleAndPosition(drumDiv, 55, 30, 0.5);
+	scaleAndPosition(guitarDiv, 5, 60, 0.55);
+	// drumDiv.style.transform = "translate(65vw, 32vh) scale(0.4)";
+	drumDiv.style.display = "block";
 	// keyboardDiv.style.transform = "translate(8vw, 40vh) scale(0.6)";
 
 	// guitarDiv.style.display = 'block';
@@ -659,6 +663,8 @@ function initStageOne()
 
 	tempoButton.style.display = 'none';
 	drumDiv.style.display = 'block';
+	guitarDiv.style.display = 'none';
+
 	// drumDiv.style.width = "100vw";
 	// drumDiv.style.height = "100vh";
 	// drumDiv.style.transform = "scale(0.4) translate(-70%, -60%)";
@@ -1044,9 +1050,10 @@ function stage1Tap(soundName)
 			{
 				stageComplete = true;
 				// console.log('all phases complete');
-				helpText.innerHTML = "Level 2";
-				helpText.style.left = "34vw";
-				// helpText.style.top = "22vw";
+				helpText.innerHTML = "Level 2: Hotkeys"; //press Q W E
+				//left hand qwe, right hand on jkl (iop better?)
+				helpText.style.left = "40vw";
+				helpText.style.top = "40vw";
 				helpText.style.transform = "rotate(0deg)";
 
 				// keyboardDiv.style.top = "11vw";
@@ -1062,7 +1069,7 @@ function stage1Tap(soundName)
 
 				//always loop last phase when stage complete
 				loopPhase(notesAndPhases.length-1, phaseDelay);
-				setTimeout(clearLoopTimers, beatTime*8);
+				setTimeout(clearLoopTimers, beatTime*9);
 				// playPhase(notesAndPhases.length-1, phaseDelay);
 			}
 			else
@@ -2005,16 +2012,20 @@ function playSoundLocal(soundName, duration)
 function stopSound(soundName)
 {
 	// console.log(soundName+' stopped.');
-	if(testingLocal)
+	if(!allDrums.includes(soundName))
 	{
-		stopSoundLocal(soundName);
+		if(testingLocal)
+		{
+			stopSoundLocal(soundName);
+		}
+		else
+		{
+			stopSoundApi(soundName, 0);
+		}
+		//untap animations
+		unAnimate(soundName);
 	}
-	else
-	{
-		stopSoundApi(soundName, 0);
-	}
-	//untap animations
-	unAnimate(soundName);
+
 }
 
 //just piano for now
@@ -2334,10 +2345,10 @@ function createGuitarHotkeys()
 	allLabels[7].style.top = "35%";
 	allLabels[8].style.right = "0%";
 	allLabels[8].style.top = "53%";
-	setTimeout(function()
-	{
-		guitarDiv.style.display = 'none';
-	},100)
+	// setTimeout(function()
+	// {
+	// 	guitarDiv.style.display = 'none';
+	// },100)
 }
 
 function createDrumHotkeys()
