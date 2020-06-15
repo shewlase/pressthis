@@ -45,12 +45,14 @@
 				<div id="string3" draggable="false"  onmouseenter='stringTap(3)'></div>
 				<div id="string4" draggable="false" onmouseenter='stringTap(4)'></div> -->
 				<img id="fretHand" draggable='false' src="images/fretUp.png">
-				<img id='knobTop' class='knob' src="images/knobTop.png">
+				<img id='knobTop' class='knob' src="images/knobTopWhite.png">
 			</div>
-			<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
-			<div id="hotkeyToggle" class="toggle toggleDisabled" onmousedown="togglePressed('hotkeys', event)"><p>Hotkeys</p></div>
+			<img src="images/keyb.png" id="hotkeyToggle" class="toggle" onmousedown="togglePressed('hotkeys', event)"></div>
+			<!-- <div id="hotkeyToggle" class="toggle toggleDisabled" onmousedown="togglePressed('hotkeys', event)"><p>Hotkeys</p></div> -->
 
 			<div id="studioDiv">
+				<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
+				
 					<!-- <div id="recordButton1" onmousedown='toggleRecord(1)'></div> -->
 				<img id="recordButton1" src='images/trackButtonRecording.png' onmousedown='cycleTrackButton(1)'>
 				<!-- Need trash class, should dynamic create all -->
@@ -59,7 +61,7 @@
 				<img id="trashTrack1" src='images/trashIcon.png' onmousedown='clearTrack(2)'> -->
 				<input type="text" id="tempoInput">
 				<!-- <img id="recordButton1" src='trackButtonRecording.png' onmousedown='toggleRecord(1)'> -->
-				<div id="startLoopTutorial" class="toggle toggleDisabled" onmousedown="startLoopTutorial()"><p>Teach me.</p></div>
+				<div id="startLoopTutorial" class="toggle toggleDisabled" onmousedown="startLoopTutorial()"><p>How to loop.</p></div>
 			</div>
 			<div id="fullWhite"></div>
 			<img id="tempoButton" class="animate1s" src="images/tempoButton.png" onmousedown='tempoTap()'>

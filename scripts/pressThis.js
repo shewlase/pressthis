@@ -245,12 +245,14 @@ function initQuick()
 	// drumDiv.style.height = "40vh";
 	// drumDiv.style.left = "5vw";
 	// drumDiv.style.top = "2vw";
-	keyboardDiv.style.top = "9vw";
-	keyboardDiv.style.left = "20vw";
-	keyboardDiv.style.height = "25vw"; //need to rebuild, 8 keys
+	// keyboardDiv.style.top = "9vw";
+	// keyboardDiv.style.left = "20vw";
+	// keyboardDiv.style.height = "25vw"; //need to rebuild, 8 keys
 	deleteAllKeyElements();
 	buildKeyboard(8);
 	addVolumeEventSquares();
+	scaleAndPosition(keyboardDiv, 8, 40, 0.5); //has to be after build keyboard
+
 	// keyboardDiv.style.width = "60vw";
 	cursorImage.style.width = "5vw";
 	studioDiv.style.display = "none";
@@ -591,6 +593,12 @@ function hideLoopTutorialStart()
 	}, 1000);//match transition time
 }
 
+//should be refreshScalePos(div) and take keyboard.x = 10, refresh(keyboard);
+function scaleAndPosition(div, x, y, scale)
+{
+	div.style.transform = "translate("+x+"vw, "+y+"vh) scale("+scale+")";
+}
+
 function initStudio()
 {
 	snare.style.opacity = "1";
@@ -599,27 +607,35 @@ function initStudio()
 	multipleGuide.style.display = 'none';
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
+	helpText.style.opacity = '0';
 
 
-
-	drumDiv.style.width = "40vw";
-	drumDiv.style.height = "40vh";
-	drumDiv.style.left = "2vw";
-	drumDiv.style.top = "2vw";
+	// drumDiv.style.width = "40vw";
+	// drumDiv.style.height = "40vh";
+	// drumDiv.style.left = "2vw";
+	// drumDiv.style.top = "2vw";
+	scaleAndPosition(drumDiv, 60, 30, 0.5);
+	// drumDiv.style.transform = "translate(65vw, 32vh) scale(0.4)";
 	drumDiv.style.display = "block";
 
-	keyboardDiv.style.top = "6vw";
-	keyboardDiv.style.left = "37vw";
-	keyboardDiv.style.height = "12vw";
+	// keyboardDiv.style.top = "6vw";
+	// keyboardDiv.style.left = "37vw";
+	// keyboardDiv.style.height = "12vw";
+	// scaleAndPosition(keyboardDiv, 8, 40, 1); //has to be after build keyboard
+
 	deleteAllKeyElements();
 	buildKeyboard(15);
 	addVolumeEventSquares();
+	scaleAndPosition(keyboardDiv, 8, 40, 0.5); //has to be after build keyboard
+
+	// keyboardDiv.style.transform = "translate(8vw, 40vh) scale(0.6)";
+
 	// guitarDiv.style.display = 'block';
 
 	cursorImage.style.width = "5vw";
-	studioDiv.style.display = "block";
-	tempoButton.style.display = 'block';
-	unhighlightPiano();
+	// studioDiv.style.display = "block";
+	// tempoButton.style.display = 'block';
+	// unhighlightPiano();
 
 	// can use like getAllTracks()[trackNumber];
 	getAllTracks()[1].isRecording = true;
@@ -643,16 +659,25 @@ function initStageOne()
 
 	tempoButton.style.display = 'none';
 	drumDiv.style.display = 'block';
-	drumDiv.style.width = "100vw";
-	drumDiv.style.height = "100vh";
-	drumDiv.style.top = "0";
+	// drumDiv.style.width = "100vw";
+	// drumDiv.style.height = "100vh";
+	// drumDiv.style.transform = "scale(0.4) translate(-70%, -60%)";
+	// drumDiv.style.transform = "scale(1) translate(10%, 0%)";
+	scaleAndPosition(drumDiv, 10, 0, 1);
 
-	keyboardDiv.style.top = "100vw";
-	keyboardDiv.style.left = "28vw";
-	keyboardDiv.style.height = "25vw";
+
+
+	// keyboardDiv.style.top = "100vw";
+	// keyboardDiv.style.left = "28vw";
+	// keyboardDiv.style.height = "25vw";
+
 	deleteAllKeyElements();
 	buildKeyboard(3);
 	addVolumeEventSquares();
+	// keyboardDiv.style.transform = "scale(0.4) translate(-20%, 20%)";
+	// keyboardDiv.style.opacity = 0.0;
+	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
+
 
 	cursorImage.style.width = "10vw"
 	studioDiv.style.display = "none";
@@ -686,7 +711,7 @@ function animateAndPlaySound(soundName, delay, duration, stringNumber)
 {
 	//always playSound/animate
 	animate(soundName, delay);
-	
+
 	if(duration != null)
 	{
 		setTimeout(function()
@@ -1019,16 +1044,20 @@ function stage1Tap(soundName)
 			{
 				stageComplete = true;
 				// console.log('all phases complete');
-				helpText.innerHTML = "Training complete!";
+				helpText.innerHTML = "Level 2";
 				helpText.style.left = "34vw";
-				helpText.style.top = "22vw";
+				// helpText.style.top = "22vw";
 				helpText.style.transform = "rotate(0deg)";
 
-				keyboardDiv.style.top = "11vw";
-				keyboardDiv.style.left = "58vw";
+				// keyboardDiv.style.top = "11vw";
+				// keyboardDiv.style.left = "58vw";
+				scaleAndPosition(keyboardDiv, 15, 25, 1);
+				scaleAndPosition(drumDiv, 50, 15, 0.5);
+
+
 				// keyboardDiv.style.height = "vw";
 
-				document.getElementById("studioTrain").style.display = "block";
+				// document.getElementById("studioTrain").style.display = "block";
 				// keyboardDiv.style.transform = "rotate(15deg)";
 
 				//always loop last phase when stage complete
@@ -1323,15 +1352,13 @@ function addVolumeEventSquares()
 //shape E, bar 0, string1
 //0, 2, 2, 1, 0, 0
 //so ba
-
-
 function initStageTwo()
 {
 	helpText.innerHTML = "Too easy!";
 	setTimeout(function()
 	{
-		snare.style.opacity = "1";
-		kick.style.opacity = "1";
+		// snare.style.opacity = "1";
+		// kick.style.opacity = "1";
 		// clickNumber = 13;
 		correctTaps = 21;
 		phaseNumber = 7;
@@ -1354,9 +1381,15 @@ function initStageTwo()
 		}
 
 		loopStartTime = new Date().getTime();
-		drumsToBack();
+		// drumsToBack();
+		scaleAndPosition(drumDiv, 60, 5, 0.5);
+		scaleAndPosition(keyboardDiv, 10, 30, 1.5);
 
-		keyboardDiv.style.top = "15vw";
+		keyboardDiv.style.opacity = 1;
+		// scaleAndPosition(keyboardDiv, 10, 10, 1);
+
+
+		// keyboardDiv.style.top = "15vw";
 		// cursorImage.style.width = "15vw";
 		setTimeout(function()
 		{
@@ -1496,10 +1529,12 @@ function bringBassLettersIn()
 
 function drumsToBack()
 {
-	drumDiv.style.width = "40vw";
-	drumDiv.style.height = "40vh";
-	drumDiv.style.top = "2vw";
-	// drumDiv.style.left = "scale(0.3)";
+	// drumDiv.style.width = "40vw";
+	// drumDiv.style.height = "40vh";
+	// drumDiv.style.top = "2vw";
+	// drumDiv.style.left = "50vw";
+	drumDiv.style.transform = "scale(0.4) translate(90%, -50%)";
+
 }
 
 function moveLettersToBack()
@@ -1531,6 +1566,7 @@ function moveLettersToBack()
 //maybe should take keyboard height
 function buildKeyboard(numKeys)
 {
+	keyboardDiv.style.transform = ''; //scale messes with everything
 	whiteKeyNum = numKeys;
 	allPianoNotes = [];
 	blackKeys = [];
@@ -2034,11 +2070,16 @@ function toggleGuitar()
 	if(showGuitar)
 	{
 		guitarDiv.style.display = "block";
+		guitarDiv.style.opacity = "1";
 		cursorImage.style.width = "10vw";
 	}
 	else
 	{
-		guitarDiv.style.display = "none";
+		guitarDiv.style.opacity = "0.0";
+		setTimeout(function()
+		{
+			guitarDiv.style.display = "none";
+		}, 200);
 		cursorImage.style.width = "5vw";
 	}
 }
@@ -2293,6 +2334,10 @@ function createGuitarHotkeys()
 	allLabels[7].style.top = "35%";
 	allLabels[8].style.right = "0%";
 	allLabels[8].style.top = "53%";
+	setTimeout(function()
+	{
+		guitarDiv.style.display = 'none';
+	},100)
 }
 
 function createDrumHotkeys()
@@ -2480,6 +2525,7 @@ function resetPianoKey(soundName)
 	}
 }
 
+//need to only work for current active sounds (e.g. 3 white keys shouldnt allow > E)
 function keyCodeToSoundname(evt)
 {
 	let soundName = 'none';

@@ -304,6 +304,7 @@ function tempoTap()
     trackRecording = 1;
     isRecording = true;
     document.getElementById("tempoInput").value = tempo;
+    document.getElementById("tempoButton").style.display = 'none';
 
     if(checkIfLoopTutorial())
     {

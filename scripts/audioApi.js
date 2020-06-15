@@ -330,13 +330,13 @@ function playSound(soundName, delay, duration, stringNumber)
 	{
     // console.log(soundName + ' stopped at '+ delay + duration);
 		//+1 at least for duration defined notes
-		let indexedSoundName = checkRepeat(soundName);
+		let indexedSoundName = getUnusedIndex(soundName);
 		activeSounds[indexedSoundName] = [source, gainNode];
 
     gainNode.gain.setTargetAtTime(0.0, context.currentTime+(delay+duration)/1000, 0.1);
 		setTimeout(function()
 		{
-			// activeSounds.splice(activeSounds.indexOf(source), 1);
+			// activeSounds.splice(indexedSoundName, 1);
 			activeSounds[indexedSoundName] = null;
 		},delay+duration+200);
 	}
@@ -355,7 +355,7 @@ function playSound(soundName, delay, duration, stringNumber)
 }
 
 //only works for cpu played notes, really need seperate playSound or activeSound arrays
-function checkRepeat(soundName)
+function getUnusedIndex(soundName)
 {
 	let indexedSoundName = soundName;
 	let index = 1;
