@@ -235,8 +235,9 @@ p
 	transform-origin: 15% 0%;
 	/* transform: rotate(-10deg); */
 	pointer-events: none;
-	left: 50vw;
-	top: 50vh;
+  /* off screen */
+	left: -50vw;
+	/* top: 50vh; */
 	transition: width 2s ease;
 }
 /* #white

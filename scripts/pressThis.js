@@ -17,12 +17,14 @@ let recordButton1;
 	//handleTap() -> game.tap();
 //MODEL - GAME
 var testingLocal;
+let isInitTap = true;
 var isAudioInit = false;
 let isLoopTutorial = false;
 var clickNumber = 0;
 var correctTaps = 0;
 let quickTapCount = 0;
 let phaseNumber = 0;
+let isTouchScreen = false;
 
 let whiteKeyNum = 0;
 let blackKeyNum = 0;
@@ -42,7 +44,7 @@ const INTRO = 1;
 const TWO = 2;
 const QUICK = 3;
 let stages = [STUDIO, INTRO, TWO, QUICK];
-let stage = STUDIO;
+let stage = INTRO;
 let quickMode = 'learn'; //play and learn
 let leftMouseDown = false;
 let multipleGuide, songTitle, progressBar;//could make it quickDiv
@@ -175,6 +177,7 @@ function init()
 	keyboardRight = document.getElementById('keyboardRight');
 	guitarDiv = document.getElementById("guitarDiv");
 	recordButton1 = document.getElementById("recordButton1");
+	initTouchDetect();
 	refreshVolumeKnobs();
 	// document.appendChild(multipleGuide);
 	// loadSounds();
@@ -188,8 +191,14 @@ function init()
 	loopTimers = [];
   initS1Loops();
 
-	setStage(stage);
+	setStage(stage); //keyboard must be build after inittouch for event differentiation
 	// buildKeyboard(15);
+	//bad, needs this before init api or allPianoNotes list creation
+	deleteAllKeyElements();
+	buildKeyboard(15);
+	addVolumeEventSquares();
+	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
+
 	addVolumeEventSquares();
 	// initStageTwo();
 	loadImages();
@@ -197,6 +206,20 @@ function init()
 	createGuitarHotkeys();
 	setTimeout(createKeyboardHotkeys, 1000);
 
+}
+
+function initTouchDetect()
+{
+	hat.onmousedown = () => initTap('mouse');
+	hat.ontouchstart = function(evt)
+	{
+		// evt.preventDefault(); //stops api init...
+		initTap('touch');
+		hat.removeEventListener("mousedown", function()
+		{
+			tap(id);
+		});
+	}
 }
 
 function setStage(stageId)
@@ -669,7 +692,7 @@ function initStageOne()
 	// drumDiv.style.height = "100vh";
 	// drumDiv.style.transform = "scale(0.4) translate(-70%, -60%)";
 	// drumDiv.style.transform = "scale(1) translate(10%, 0%)";
-	scaleAndPosition(drumDiv, 10, 0, 1);
+	scaleAndPosition(drumDiv, 20, 10, 0.8);
 
 
 
@@ -677,12 +700,13 @@ function initStageOne()
 	// keyboardDiv.style.left = "28vw";
 	// keyboardDiv.style.height = "25vw";
 
-	deleteAllKeyElements();
-	buildKeyboard(3);
-	addVolumeEventSquares();
 	// keyboardDiv.style.transform = "scale(0.4) translate(-20%, 20%)";
 	// keyboardDiv.style.opacity = 0.0;
-	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
+
+	// deleteAllKeyElements();
+	// buildKeyboard(3);
+	// addVolumeEventSquares();
+	// scaleAndPosition(keyboardDiv, -40, 30, 1.5);
 
 
 	cursorImage.style.width = "10vw"
@@ -739,6 +763,41 @@ function animateAndPlaySound(soundName, delay, duration, stringNumber)
 		playSound(soundName, delay, duration, stringNumber);
 	}
 }
+
+function initTap(eventType)
+{
+	//add event listeners
+	// let allDrums = ['kick', 'hat', 'snare'];
+	tap('hat');
+	// animateAndPlaySound('hat');
+	console.log(eventType);
+	for(let i = 0; i < allDrums.length; i++)
+	{
+		let id = allDrums[i];
+		let drum = document.querySelector('#'+id);
+		if(eventType == 'mouse')
+		{
+			drum.onmousedown = function()
+			{
+				tap(id);
+			}
+		}
+		else if(eventType == 'touch')
+		{
+			isTouchScreen = true;
+			drum.ontouchstart = function(evt)
+			{
+				tap(id);
+				evt.preventDefault();
+			}
+		}
+	}
+	deleteAllKeyElements();
+	buildKeyboard(3);
+	addVolumeEventSquares();
+	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
+}
+
 //Run everytime a letter is tapped/clicked
 //TODO: stageOneTap(soundName);
 function tap(soundName, stringNumber)
@@ -976,6 +1035,10 @@ function playPhaseAndDisableInput()
 function stage1Tap(soundName)
 {
 	// currentNote = notesInOrder[clickNumber-1];
+	if(isInitTap)
+	{
+		//check tap or click
+	}
 	clickNumber++;// need add check for correct letter aswel
 	currentNote = notesAndPhases[phaseNumber][clickNumber-1];
 	let currentPhase = notesAndPhases[phaseNumber];
@@ -1603,38 +1666,76 @@ function buildKeyboard(numKeys)
 		allPianoNotes.push(keyId);
 		// keyElement.style.left = leftPos+"%";
 		keyElement.style.left = leftPos+"vw";
-		keyElement.onmousedown = function(event)
+		if(!isTouchScreen)
 		{
-			tap(keyId);
-		}
-		keyElement.onmouseup = function(event)
-		{
-			// stopSoundLocal(keyId);
-			stopSound(keyId);
-			saveNoteToTrack(keyId);
-			// resetPianoKey(keyId);
-
-			// document.getElementById(keyId).src = "images/whiteKey.png";
-		}
-		keyElement.onmouseenter = function(event)
-		{
-			if(leftMouseDown)
+			keyElement.onmousedown = function(event)
 			{
 				tap(keyId);
 			}
-		}
-		keyElement.onmouseleave = function(event)
-		{
-			//will be same as mouse up code i.e. stop sound
-			// stopSoundLocal(keyId);
-			if(leftMouseDown)
+			keyElement.onmouseup = function(event)
 			{
+				// stopSoundLocal(keyId);
 				stopSound(keyId);
 				saveNoteToTrack(keyId);
 				// resetPianoKey(keyId);
+
 				// document.getElementById(keyId).src = "images/whiteKey.png";
 			}
+			keyElement.onmouseenter = function(event)
+			{
+				if(leftMouseDown)
+				{
+					tap(keyId);
+				}
+			}
+			keyElement.onmouseleave = function(event)
+			{
+				//will be same as mouse up code i.e. stop sound
+				// stopSoundLocal(keyId);
+				if(leftMouseDown)
+				{
+					stopSound(keyId);
+					saveNoteToTrack(keyId);
+					// resetPianoKey(keyId);
+					// document.getElementById(keyId).src = "images/whiteKey.png";
+				}
+			}
 		}
+		else
+		{
+			keyElement.ontouchstart = function(evt)
+			{
+				tap(keyId);
+				evt.preventDefault();
+			}
+			keyElement.ontouchend = function(evt)
+			{
+				stopSound(keyId);
+				saveNoteToTrack(keyId);
+				evt.preventDefault();
+			}
+			// keyElement.onmouseenter = function(event)
+			// {
+			// 	if(leftMouseDown)
+			// 	{
+			// 		tap(keyId);
+			// 	}
+			// }
+			// keyElement.onmouseleave = function(event)
+			// {
+			// 	//will be same as mouse up code i.e. stop sound
+			// 	// stopSoundLocal(keyId);
+			// 	if(leftMouseDown)
+			// 	{
+			// 		stopSound(keyId);
+			// 		saveNoteToTrack(keyId);
+			// 		// resetPianoKey(keyId);
+			// 		// document.getElementById(keyId).src = "images/whiteKey.png";
+			// 	}
+			// }
+		}
+
+
 
 		let keyBg = keyElement.cloneNode(true);
 		keyElement.id = keyId;
@@ -1662,39 +1763,57 @@ function buildKeyboard(numKeys)
 			allPianoNotes.push(blackKeyId);
 
 			blackKeyElement.style.left = leftBlackPos+"vw";
-			blackKeyElement.onmousedown = function(event)
-			{
-				//move element down x, and return after a time
-				// whiteKeyPressed(event.target);
-				tap(blackKeyId);
-			}
-			blackKeyElement.onmouseup = function(event)
-			{
-				// stopSoundLocal(keyId);
-				stopSound(blackKeyId);
-				saveNoteToTrack(blackKeyId);
-				// resetPianoKey(blackKeyId);
 
-				// blackKeyElement.src = "images/blackKey.png";
-			}
-			blackKeyElement.onmouseenter = function(event)
+			if(!isTouchScreen)
 			{
-				if(leftMouseDown)
+				blackKeyElement.onmousedown = function(event)
 				{
+					//move element down x, and return after a time
+					// whiteKeyPressed(event.target);
 					tap(blackKeyId);
 				}
-
-			}
-			blackKeyElement.onmouseleave = function(event)
-			{
-				//will be same as mouse up code
-				if(leftMouseDown)
+				blackKeyElement.onmouseup = function(event)
 				{
+					// stopSoundLocal(keyId);
 					stopSound(blackKeyId);
 					saveNoteToTrack(blackKeyId);
 					// resetPianoKey(blackKeyId);
 
 					// blackKeyElement.src = "images/blackKey.png";
+				}
+				blackKeyElement.onmouseenter = function(event)
+				{
+					if(leftMouseDown)
+					{
+						tap(blackKeyId);
+					}
+
+				}
+				blackKeyElement.onmouseleave = function(event)
+				{
+					//will be same as mouse up code
+					if(leftMouseDown)
+					{
+						stopSound(blackKeyId);
+						saveNoteToTrack(blackKeyId);
+						// resetPianoKey(blackKeyId);
+
+						// blackKeyElement.src = "images/blackKey.png";
+					}
+				}
+			}
+			else //touchscreen events
+			{
+				blackKeyElement.ontouchstart = function(evt)
+				{
+					tap(blackKeyId);
+					evt.preventDefault();
+				}
+				blackKeyElement.ontouchend = function(evt)
+				{
+					stopSound(blackKeyId);
+					saveNoteToTrack(blackKeyId);
+					evt.preventDefault();
 				}
 			}
 			let blackKeyBg = blackKeyElement.cloneNode(true);
@@ -1921,7 +2040,7 @@ function updateCursorImage(event)
 document.onmousemove = function(event)
 {
 	//get x and y, update cursor location
-	event.preventDefault();
+	event.preventDefault(); //stop draggable images
 	mouseX = event.clientX;
 	mouseY = event.clientY;
 	if(isDraggingVolume)
@@ -1931,7 +2050,10 @@ document.onmousemove = function(event)
 	}
 	else
 	{
-		updateCursorImage(event); //keeps image with cursor
+		if(!isTouchScreen)
+		{
+			updateCursorImage(event); //keeps image with cursor
+		}
 	}
 };
 
@@ -2025,7 +2147,6 @@ function stopSound(soundName)
 		//untap animations
 		unAnimate(soundName);
 	}
-
 }
 
 //just piano for now
@@ -2171,6 +2292,12 @@ function fretKeyUp()
 	// console.log(fretKeysHeld);
 }
 
+//differentiate between touch and click
+function addDrumListeners()
+{
+
+}
+
 function updateFretHand()
 {
 	fretHand.style.width = "13%";
@@ -2302,7 +2429,7 @@ function createHotkey(letter, instrumentId, leftPos, topPos)
 		// console.log(instLeftPercent, instWidthPercent);
 }
 
-//for x2 x3 etc
+//for x2 x3 multipliers
 //could just move instead of create each time
 function writeAt(char, x, y)
 {
@@ -2441,6 +2568,11 @@ function clearLoopTimers()
 }
 
 
+document.ontouchstart = function(evt)
+{
+
+}
+
 document.onmousedown = function(evt)
 {
 	leftMouseDown = true;
@@ -2451,11 +2583,6 @@ document.onmousedown = function(evt)
 	if(!isDraggingVolume)
 	{
 		cursorImage.src = "images/cursorDown.png";
-	}
-	if(evt.which == 1)
-	{
-		// leftMouseDown = true;
-		// cursorImage.src = "cursorDown.png";
 	}
 }
 
@@ -2471,12 +2598,8 @@ document.onmouseup = function(evt)
 		volumeInstrument = '';
 		volumeDragStart = null;
 	}
-	if(evt.which == 1)
-	{
-		// leftMouseDown = false;
-		// cursorImage.src = "cursor.png";
-	}
 }
+
 
 //should be element tpgether in array
 // let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num

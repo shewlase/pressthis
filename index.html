@@ -12,11 +12,12 @@
 			<img id='cursorImage' src='images/cursor.png'>
 
 			<div id="drumDiv" class="animated">
-				<img id="hat" class="animated drum" src="images/cymbal.png" alt = "w" onmousedown = "tap('hat');">
+				<img id="hat" class="animated drum" src="images/cymbal.png" alt = "w">
+				<!-- <img id="hat" class="animated drum" src="images/cymbal.png" alt = "w" onmousedown = "tap('hat');" ontouchstart = "tap('hat')"> -->
 
-				<img id="snare" class="animated drum" src="images/snare.png" alt = "s" onmousedown = "tap('snare');">
+				<img id="snare" class="animated drum" src="images/snare.png" alt = "s">
 
-				<img id="kick" class="animated drum" src="images/kick.png" alt = "a" onmousedown = "tap('kick');">
+				<img id="kick" class="animated drum" src="images/kick.png" alt = "a">
 			</div>
 
 			<div id="keyboardDiv">
@@ -52,7 +53,7 @@
 
 			<div id="studioDiv">
 				<div id="tempoToggle" class="toggle toggleEnabled" onmousedown="togglePressed('metronome', event)"><p>Metronome</p></div>
-				
+
 					<!-- <div id="recordButton1" onmousedown='toggleRecord(1)'></div> -->
 				<img id="recordButton1" src='images/trackButtonRecording.png' onmousedown='cycleTrackButton(1)'>
 				<!-- Need trash class, should dynamic create all -->
