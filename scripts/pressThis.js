@@ -2674,7 +2674,8 @@ function keyCodeToSoundname(evt)
 		}
 	}
 
-	if(pianoHotkeys.includes(key))
+	let activePianokeys = pianoHotkeys.slice(0, whiteKeyNum);
+	if(activePianokeys.includes(key))
 	{
 		let soundIndex = pianoHotkeys.indexOf(key);
 		// tap('p'+(soundIndex+1));
