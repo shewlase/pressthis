@@ -196,10 +196,10 @@ function loadSoundBlob(blob)
 		{
 			loopBuffer = audioBuffer;
 			playLoopBuffer();//start looping
-			blobLoopTimer = setInterval(function()
-			{
-				playLoopBuffer();//start looping
-			}, audioBuffer.duration*1000);
+		// 	blobLoopTimer = setInterval(function()
+		// 	{
+		// 		playLoopBuffer();//start looping
+		// 	}, audioBuffer.duration*1000);
     });
 	}
 
@@ -213,6 +213,7 @@ function playLoopBuffer()
 	source.buffer = loopBuffer;
 	source.connect(context.destination);
 	source.start(0);
+	source.loop = true;
 }
 
 function loadGuitarSounds()

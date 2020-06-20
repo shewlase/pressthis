@@ -93,6 +93,10 @@ let playingStrings;
 var blackKeys = [];
 let whiteKeyHotkeys = ["r", "t", "y", "u", "i", "o", "p"];
 let blackKeyHotkeys = ["5", "6", "8", "9", "0"];
+
+let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8'];//q to 9num
+let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
+
 let allPianoNotes = [];
 let threeToShow = [];
 // let firstRiffNotes = ['p1', 'p3', 'p5', 'p1', 'p3', 'p5', 'p1', 'p3'];
@@ -194,18 +198,35 @@ function init()
 	setStage(stage); //keyboard must be build after inittouch for event differentiation
 	// buildKeyboard(15);
 	//bad, needs this before init api or allPianoNotes list creation
-	deleteAllKeyElements();
-	buildKeyboard(15);
+	// deleteAllKeyElements();
+	// buildKeyboard(15);
+	// setTimeout(createKeyboardHotkeys, 1000);//need after everybuld
+	redrawKeyboardAndHotkeys(15);
+
 	addVolumeEventSquares();
-	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
+	scaleAndPosition(keyboardDiv, -200, 30, 1.5);//offscreen for building
 
 	addVolumeEventSquares();
 	// initStageTwo();
 	loadImages();
 	createDrumHotkeys();
 	createGuitarHotkeys();
-	setTimeout(createKeyboardHotkeys, 1000);
+	// setTimeout(createKeyboardHotkeys, 1000);//need after everybuld
 
+}
+
+function redrawKeyboardAndHotkeys(whiteNum)
+{
+	deleteAllKeyElements();
+	buildKeyboard(whiteNum);
+	// setTimeout(createKeyboardHotkeys, 1000);
+	addVolumeEventSquares();//for guitar too?
+}
+
+function deleteKeyHotKeys()
+{
+	let allLetters = keyboardDiv.querySelectorAll('.hotkeyLetter');
+	allLetters.forEach(letter => keyboardDiv.removeChild(letter));
 }
 
 function initTouchDetect()
@@ -273,9 +294,10 @@ function initQuick()
 	// keyboardDiv.style.top = "9vw";
 	// keyboardDiv.style.left = "20vw";
 	// keyboardDiv.style.height = "25vw"; //need to rebuild, 8 keys
-	deleteAllKeyElements();
-	buildKeyboard(8);
-	addVolumeEventSquares();
+	// deleteAllKeyElements();
+	// buildKeyboard(8);
+	// addVolumeEventSquares();
+	redrawKeyboardAndHotkeys(8);
 	scaleAndPosition(keyboardDiv, 8, 40, 0.5); //has to be after build keyboard
 
 	// keyboardDiv.style.width = "60vw";
@@ -647,9 +669,7 @@ function initStudio()
 	// keyboardDiv.style.height = "12vw";
 	// scaleAndPosition(keyboardDiv, 8, 40, 1); //has to be after build keyboard
 
-	deleteAllKeyElements();
-	buildKeyboard(15);
-	addVolumeEventSquares();
+	redrawKeyboardAndHotkeys(15);
 	scaleAndPosition(keyboardDiv, 8, 20, 0.5); //has to be after build keyboard
 	scaleAndPosition(drumDiv, 55, 30, 0.5);
 	scaleAndPosition(guitarDiv, 5, 60, 0.55);
@@ -769,6 +789,7 @@ function initTap(eventType)
 	//add event listeners
 	// let allDrums = ['kick', 'hat', 'snare'];
 	tap('hat');
+	playSoundLocal('hat');
 	// animateAndPlaySound('hat');
 	console.log(eventType);
 	for(let i = 0; i < allDrums.length; i++)
@@ -792,9 +813,7 @@ function initTap(eventType)
 			}
 		}
 	}
-	deleteAllKeyElements();
-	buildKeyboard(3);
-	addVolumeEventSquares();
+	redrawKeyboardAndHotkeys(3);
 	scaleAndPosition(keyboardDiv, -40, 30, 1.5);
 }
 
@@ -1113,7 +1132,7 @@ function stage1Tap(soundName)
 			{
 				stageComplete = true;
 				// console.log('all phases complete');
-				helpText.innerHTML = "Level 2: Hotkeys"; //press Q W E
+				helpText.innerHTML = "Stage complete"; //show studio unlocked
 				//left hand qwe, right hand on jkl (iop better?)
 				helpText.style.left = "40vw";
 				helpText.style.top = "40vw";
@@ -1124,6 +1143,18 @@ function stage1Tap(soundName)
 				scaleAndPosition(keyboardDiv, 15, 25, 1);
 				scaleAndPosition(drumDiv, 50, 15, 0.5);
 
+				setTimeout(function()
+				{
+					//tap/click based on isTouchScreen
+					helpText.innerHTML = "Level 2: Hotkeys (no clicking)";
+					setTimeout(function()
+					{
+						helpText.innerHTML = "Press 'Q W E'"; //press Q W E
+						toggleHotkeys();
+						// play qwewq
+					}, 2000);
+				}, 2000);
+
 
 				// keyboardDiv.style.height = "vw";
 
@@ -1131,9 +1162,9 @@ function stage1Tap(soundName)
 				// keyboardDiv.style.transform = "rotate(15deg)";
 
 				//always loop last phase when stage complete
-				loopPhase(notesAndPhases.length-1, phaseDelay);
+				// loopPhase(notesAndPhases.length-1, phaseDelay);
 				setTimeout(clearLoopTimers, beatTime*9);
-				// playPhase(notesAndPhases.length-1, phaseDelay);
+				playPhase(notesAndPhases.length-1, phaseDelay);
 			}
 			else
 			{
@@ -1636,6 +1667,7 @@ function moveLettersToBack()
 //maybe should take keyboard height
 function buildKeyboard(numKeys)
 {
+	deleteKeyHotKeys();
 	keyboardDiv.style.transform = ''; //scale messes with everything
 	whiteKeyNum = numKeys;
 	allPianoNotes = [];
@@ -1736,7 +1768,6 @@ function buildKeyboard(numKeys)
 		}
 
 
-
 		let keyBg = keyElement.cloneNode(true);
 		keyElement.id = keyId;
 		// allPianoNotes.push(keyId);
@@ -1749,6 +1780,7 @@ function buildKeyboard(numKeys)
 		document.getElementById('keyboardDiv').appendChild(keyBg);
 		document.getElementById('keyboardDiv').appendChild(keyElement);
 		// createHotkey(whiteKeyHotkeys[i], keyId, 0.05, 0.8);
+		createHotkey(pianoHotkeys[i], keyId, 0.15, 1.1);
 
 		//black keys
 		if(numInOctave != 2 && numInOctave != 6 && i < numKeys-1)
@@ -1845,6 +1877,8 @@ function buildKeyboard(numKeys)
 		// let blackKeyBgEl = blackKeys[i+1];
 		document.getElementById('keyboardDiv').appendChild(blackKeyBgEl);
 		document.getElementById('keyboardDiv').appendChild(blackKeyEl);
+		createHotkey(blackHotkeys[i], blackKeyEl.id, 0.15, 0.55);//wrong, has -1s
+
 		// document.getElementById('keyboardDiv').appendChild(blackKeyBg);
 		// document.getElementById('keyboardDiv').appendChild(blackKeyElement);
 	}
@@ -2084,6 +2118,7 @@ function showSnare()
 	helpText.style.left = "58vw";
 	helpText.style.transform = "rotate(15deg)";
 	helpText.innerHTML = "Now This!";
+	playSoundLocal('snare');//api not loaded all yet
 }
 
 function showKick()
@@ -2424,6 +2459,7 @@ function createHotkey(letter, instrumentId, leftPos, topPos)
 	letterEl.style.left = hotKeyLeftPercent+"%";
 	letterEl.style.top = hotKeyTopPercent+"%";
 	parent.appendChild(letterEl);
+	//split per instrument?
 	allHotkeys.push(letterEl);
 	return letterEl;
 		// console.log(instLeftPercent, instWidthPercent);
@@ -2492,13 +2528,14 @@ function createDrumHotkeys()
 
 function createKeyboardHotkeys()
 {
+	deleteKeyHotKeys();
 	let xPercent = 0.15;
 	// createHotkey("5", blackKeys[1].id, xPercent, yPercent);
 	// createHotkey("6", blackKeys[3].id, xPercent, yPercent);
 	// createHotkey("8", blackKeys[5].id, xPercent, yPercent);
 	// createHotkey("9", blackKeys[7].id, xPercent, yPercent);
 	// createHotkey("0", blackKeys[9].id, xPercent, yPercent);
-	let hotKeyHackArray = blackHotkeys.filter(a => a !== -1);
+	let hotKeyHackArray = blackHotkeys.filter(a => a !== -1); //for black key gaps
 	// for(let i = 0; i < blackKeyNum; i++)
 	for(let i = 0; i < blackKeys.length; i++)
 	{
@@ -2605,8 +2642,7 @@ document.onmouseup = function(evt)
 // let pianoHotkeys = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, 220, 103, 104, 105];//q to 9num
 // let blackHotkeys = [50, 51, -1, 53, 54, 55, -1, 57, 48, -1, 187, 8];
 
-let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8'];//q to 9num
-let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
+
 // let stringHotkeys = ['n4', 'n5', 'n6'];
 // let topFretHotkeys = ['a', 's', 'd'];
 // let bottomFretHotkeys = ['z', 'x', 'c'];
