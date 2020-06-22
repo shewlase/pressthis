@@ -260,16 +260,17 @@ let playRate = 1;
 function transpose(direction)
 {
 	transposePosition+= direction;
+	let calcConstant = Math.pow(2, 1/12);
 	if(direction < 0)
 	{
-	    playRate = Math.pow(Math.pow(2, 1/12),-transposePosition);
+	    playRate = Math.pow(calcConstant,-transposePosition);
 			playRate = 1-(playRate-1);
 		//go opposite direction, 1-(playRate-1);
 		// playRate = Math.pow(Math.pow(2, 1/12),transposePosition);
 	}
 	else
 	{
-	    playRate = Math.pow(Math.pow(2, 1/12),transposePosition);
+	    playRate = Math.pow(calcConstant,transposePosition);
 	}
 }
 

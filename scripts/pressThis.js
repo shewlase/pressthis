@@ -125,6 +125,8 @@ let twinkleNotes = ['p1', 'p1', 'p5', 'p5', 'p6', 'p6', 'p5', 'p4', 'p4', 'p3', 
  'p4', 'p3', 'p3', 'p2', 'p2', 'p1'];
 
 let twinkleTrack = new Track(1, twinkleNotes, true, 'Twinkle Twinkle');
+twinkleTrack.phaseLengths = [4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3];
+
 let maryHadTrack = new Track(1, maryHadNotes, true, 'Mary Had A Little Lamb');
 let rowRowTrack = new Track(1, rowRowNotes, true, 'Row Row Row Your Boat');
 let oldMacTrack = new Track(1, oldMacNotes, true, 'Old Mc Donald');
@@ -272,7 +274,7 @@ function initQuick()
 	multipleGuide.style.display = 'block';
 	progressBar.style.display = 'block';
 	drumDiv.style.display = "none";
-	guitarDiv.style.display = 'block';
+	guitarDiv.style.display = 'none';
 
 	//need tracks div?
 	recordButton1.style.display = 'none';
@@ -282,7 +284,7 @@ function initQuick()
 	helpText.innerHTML = "Play first key to start timer";
 	// helpText.style.left = "45vw";
 	helpText.style.top = "40vw";
-	helpText.style.width = "100vw";
+	// helpText.style.width = "100vw";
 	helpText.style.textAlign = "center";
 	helpText.style.rotate = "0deg";
 	tempoButton.style.display = 'none';
@@ -298,7 +300,7 @@ function initQuick()
 	// buildKeyboard(8);
 	// addVolumeEventSquares();
 	redrawKeyboardAndHotkeys(8);
-	scaleAndPosition(keyboardDiv, 8, 40, 0.5); //has to be after build keyboard
+	scaleAndPosition(keyboardDiv, 25, 25, 1); //has to be after build keyboard
 
 	// keyboardDiv.style.width = "60vw";
 	cursorImage.style.width = "5vw";
@@ -309,7 +311,7 @@ function initQuick()
 	//on quickMode select, choose whether to play first phase or just show next 3
 	// allRiffs = [rowRowTrack, oldMacTrack, maryHadTrack, twinkleTrack];
 	// allRiffs = [firstRiffTrack, secondRiffTrack, thirdRiffTrack, fourthRiffTrack];
-	allRiffs = [secondRiffTrack];
+	allRiffs = [twinkleTrack];
 	currentRiff = allRiffs[0];
 	if(quickMode == 'play')
 	{
@@ -690,6 +692,8 @@ function initStudio()
 
 function initStageOne()
 {
+	clickNumber = 0;
+	phaseNumber = 0;
 	snare.style.opacity = "0";
 	kick.style.opacity = "0";
 	helpText.style.opacity = "1";
@@ -700,7 +704,7 @@ function initStageOne()
 
 	helpText.innerHTML = "Press this!";
 	helpText.style.top = "21vw";
-	helpText.style.left = "32vw";
+	helpText.style.left = "40vw";
 	helpText.style.transform = "rotate(-15deg)";
 	fullWhite.style.display = 'none';
 
@@ -713,6 +717,8 @@ function initStageOne()
 	// drumDiv.style.transform = "scale(0.4) translate(-70%, -60%)";
 	// drumDiv.style.transform = "scale(1) translate(10%, 0%)";
 	scaleAndPosition(drumDiv, 20, 10, 0.8);
+	scaleAndPosition(keyboardDiv, -40, 30, 0.2);
+
 
 
 
@@ -1146,10 +1152,16 @@ function stage1Tap(soundName)
 				setTimeout(function()
 				{
 					//tap/click based on isTouchScreen
-					helpText.innerHTML = "Level 2: Hotkeys (no clicking)";
+					helpText.innerHTML = "Level 2: Keyboard only";
+					// cursorImage.style.width = "5vw";
 					setTimeout(function()
 					{
-						helpText.innerHTML = "Press 'Q W E'"; //press Q W E
+						helpText.innerHTML = "Left hand 'Q W E'"; //press Q W E
+						// helpText.innerHTML = "Faster!"; //press J K L
+						// helpText.innerHTML = "Left hand 'J K L'"; //press J K L
+						// helpText.innerHTML = "Faster!"; //press J K L
+						// helpText.innerHTML = "Together J+Q"; //press J K L
+
 						toggleHotkeys();
 						// play qwewq
 					}, 2000);
@@ -2118,7 +2130,7 @@ function showSnare()
 	helpText.style.left = "58vw";
 	helpText.style.transform = "rotate(15deg)";
 	helpText.innerHTML = "Now This!";
-	playSoundLocal('snare');//api not loaded all yet
+	// playSoundLocal('snare');//api not loaded all yet
 }
 
 function showKick()
