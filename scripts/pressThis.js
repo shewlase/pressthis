@@ -97,6 +97,7 @@ let blackKeyHotkeys = ["5", "6", "8", "9", "0"];
 
 let pianoHotkeys = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'n7', 'n8'];//q to 9num
 let blackHotkeys = ['2', '3', -1, '5', '6', '7', -1,  '9', '0', -1, '=', 'Backspace'];
+let fixedBlackHotkeys = ['2', '3', '5', '6', '7', '9', '0', '=', '&#x232B', ''];
 
 let allPianoNotes = [];
 let threeToShow = [];
@@ -1215,7 +1216,7 @@ function initS1B()
 			clickNumber = 0;
 			notesAndPhases =  [['p1', 'p2', 'p3'], ['p1', 'p2', 'p3'], ['kick', 'hat', 'snare'],
 						['p1', 'p2', 'p3', 'p2', 'p1'], ['kick', 'hat', 'snare' ,'hat', 'kick'],
-						['p1', 'p2', 'p3', 'p2', 'p1'], ['kick', 'hat', 'snare' ,'hat', 'kick']];
+						['p1', 'p2', 'p3', 'p2', 'p1']];
 			playPhase(0, 1000);
 			phaseNumber = 0;
 
@@ -1225,29 +1226,56 @@ function initS1B()
 
 function stage1bTap(soundName)
 {
-	clickNumber++;
-	//if phase over / == 5, check if simultaneoous notes are within x ms of eachother
+	if(phaseNumber == 5)
+	{
+		//ignore drum hits
+		if(!allDrums.includes(soundName))
+		{
+			clickNumber++;
+		}
+	}
+	else
+	{
+		clickNumber++;
+	}
+	//if phase over / == 5, check if simultaneous notes are within x ms of eachother
 	// before triggering wrong note,
 	// need check if both notes are correct/within time limit
 	if(phaseNumber > 5)
 	{
 		// sameTimeTap(soundName);?
 		// return;?
-		//check lefthand notes against different phase, 
+		//check lefthand notes against different phase, on first note start simultaneous timer
+		//   if next note within time, correct taps
 	}
+
 	currentNote = notesAndPhases[phaseNumber][clickNumber-1];
 	let currentPhase = notesAndPhases[phaseNumber];
 	let phaseDelay = 1000;
 	let passedCurrentPhase = (clickNumber == currentPhase.length);
 
 	let isCorrectTap = (soundName == currentNote);
-	if(!isCorrectTap && !stageComplete && stage != STUDIO)
+
+	if(phaseNumber == 5 && allDrums.includes(soundName))
 	{
-		//replays last phase for listening
-		wrongNote();//subtracts 1 from clickNumber
-		if(phaseNumber == 5)
+
+	}
+
+	if(!isCorrectTap && !stageComplete)
+	{
+
+		if(!allDrums.includes(soundName))
 		{
-			playPhase(4, 500);
+			//replays last phase for listening
+			wrongNote();//subtracts 1 from clickNumber
+			if(phaseNumber == 5)
+			{
+				playPhase(4, 500);
+			}
+		}
+		else
+		{
+
 		}
 	}
 	else //correct hit
@@ -1266,7 +1294,16 @@ function stage1bTap(soundName)
 			//advance
 			if(phaseNumber == notesAndPhases.length-1)//stage complete
 			{
-
+				helpText.innerHTML = "Nice!";
+				setTimeout(function()
+				{
+						helpText.innerHTML = "Studio unlocked.";
+						setTimeout(function()
+						{
+								setStage(STUDIO);
+						}, 2000);//match transition time
+				}, 2000);//match transition time
+				//studio unlocked, show icon
 			}
 			else
 			{
@@ -2038,6 +2075,7 @@ function buildKeyboard(numKeys)
 		numInOctave++;
 	}
 
+
 	//have to add all black keys on top of white
 	for(let i = 0; i < blackKeys.length; i++)
 	{
@@ -2047,7 +2085,7 @@ function buildKeyboard(numKeys)
 		// let blackKeyBgEl = blackKeys[i+1];
 		document.getElementById('keyboardDiv').appendChild(blackKeyBgEl);
 		document.getElementById('keyboardDiv').appendChild(blackKeyEl);
-		createHotkey(blackHotkeys[i], blackKeyEl.id, 0.15, 0.55);//wrong, has -1s
+		createHotkey(fixedBlackHotkeys[i], blackKeyEl.id, 0.15, 0.55);//wrong, has -1s
 
 		// document.getElementById('keyboardDiv').appendChild(blackKeyBg);
 		// document.getElementById('keyboardDiv').appendChild(blackKeyElement);
