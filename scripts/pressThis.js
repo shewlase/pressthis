@@ -45,7 +45,8 @@ const TWO = 2;
 const QUICK = 3;
 let stages = [STUDIO, INTRO, TWO, QUICK];
 let stage = INTRO;
-let quickMode = 'learn'; //play and learn
+let isIntroPartB = false;
+let quickMode = 'play'; //play and learn
 let leftMouseDown = false;
 let multipleGuide, songTitle, progressBar;//could make it quickDiv
 //images not used initially but change with user events
@@ -139,6 +140,10 @@ let thirdRiffTrack = new Track(1, thirdRiffNotes, true, 'Third Riff');
 // thirdRiffTrack.phaseLengths = [8, 8, 8, 8];
 
 let fourthRiffTrack = new Track(1, fourthRiffNotes, true, 'Fourth Riff');
+
+let s1bNotes = ['p1', 'p2', 'p3', 'kick', 'hat', 'snare'];
+let s1bNotesTrack = new Track(1, s1bNotes, true, 's1b');
+secondRiffTrack.phaseLengths = [4,4];
 
 // let twinkle = new Song('Twinkle Twinkle', twinkleNotes);
 
@@ -251,6 +256,7 @@ function setStage(stageId)
 	if(stage == INTRO)
 	{
 		initStageOne();
+		// initS1B();
 	}
 	else if(stage == STUDIO)
 	{
@@ -281,7 +287,6 @@ function initQuick()
 	document.getElementById("trashTrack1").style.display = 'none';
 	// // helpText.style.opacity = "0";
 	// helpText.style.transform = "rotate(0deg)";
-	helpText.innerHTML = "Play first key to start timer";
 	// helpText.style.left = "45vw";
 	helpText.style.top = "40vw";
 	// helpText.style.width = "100vw";
@@ -309,9 +314,9 @@ function initQuick()
 
 	//on song select, set allRiffs etc
 	//on quickMode select, choose whether to play first phase or just show next 3
-	// allRiffs = [rowRowTrack, oldMacTrack, maryHadTrack, twinkleTrack];
+	allRiffs = [rowRowTrack, oldMacTrack, maryHadTrack, twinkleTrack];
 	// allRiffs = [firstRiffTrack, secondRiffTrack, thirdRiffTrack, fourthRiffTrack];
-	allRiffs = [twinkleTrack];
+	// allRiffs = [secondRiffTrack];
 	currentRiff = allRiffs[0];
 	if(quickMode == 'play')
 	{
@@ -319,12 +324,16 @@ function initQuick()
 		// allRiffs = [twinkleTrack];
 		// allRiffs = [twinkleTrack];
 		// currentRiff = allRiffs[0];
+		helpText.innerHTML = "Play first key to start timer"; //only
+
 		updateThreeKeys();
 	}
 	else if(quickMode == 'learn')
 	{
 		// allRiffs = [twinkleTrack];
 		// currentRiff = allRiffs[0];
+		helpText.innerHTML = "listen"; //only
+
 		phasePos = 0;
 		riffProgress = 0;
 		// phaseSize = 7;//will be dynamic phaseLengths[phasePos]
@@ -698,6 +707,8 @@ function initStageOne()
 	kick.style.opacity = "0";
 	helpText.style.opacity = "1";
 
+	isIntroPartB = false;
+
 	multipleGuide.style.display = 'none';
 	songTitle.style.display = 'none';
 	progressBar.style.display = 'none';
@@ -851,7 +862,14 @@ function tap(soundName, stringNumber)
 	}
 	else if(stage == INTRO)
 	{
-		stage1Tap(soundName);
+		if(!isIntroPartB)
+		{
+			stage1Tap(soundName);
+		}
+		else
+		{
+			stage1bTap(soundName);
+		}
 	}
 	else if(stage == QUICK)
 	{
@@ -1136,36 +1154,15 @@ function stage1Tap(soundName)
 			// console.log('new phase');
 			if(phaseNumber == notesAndPhases.length-1)//stage complete
 			{
+
 				stageComplete = true;
 				// console.log('all phases complete');
 				helpText.innerHTML = "Stage complete"; //show studio unlocked
-				//left hand qwe, right hand on jkl (iop better?)
-				helpText.style.left = "40vw";
-				helpText.style.top = "40vw";
-				helpText.style.transform = "rotate(0deg)";
+				setTimeout(clearLoopTimers, beatTime*9);
+				playPhase(notesAndPhases.length-1, phaseDelay);
 
-				// keyboardDiv.style.top = "11vw";
-				// keyboardDiv.style.left = "58vw";
-				scaleAndPosition(keyboardDiv, 15, 25, 1);
-				scaleAndPosition(drumDiv, 50, 15, 0.5);
+				initS1B();
 
-				setTimeout(function()
-				{
-					//tap/click based on isTouchScreen
-					helpText.innerHTML = "Level 2: Keyboard only";
-					// cursorImage.style.width = "5vw";
-					setTimeout(function()
-					{
-						helpText.innerHTML = "Left hand 'Q W E'"; //press Q W E
-						// helpText.innerHTML = "Faster!"; //press J K L
-						// helpText.innerHTML = "Left hand 'J K L'"; //press J K L
-						// helpText.innerHTML = "Faster!"; //press J K L
-						// helpText.innerHTML = "Together J+Q"; //press J K L
-
-						toggleHotkeys();
-						// play qwewq
-					}, 2000);
-				}, 2000);
 
 
 				// keyboardDiv.style.height = "vw";
@@ -1175,8 +1172,7 @@ function stage1Tap(soundName)
 
 				//always loop last phase when stage complete
 				// loopPhase(notesAndPhases.length-1, phaseDelay);
-				setTimeout(clearLoopTimers, beatTime*9);
-				playPhase(notesAndPhases.length-1, phaseDelay);
+
 			}
 			else
 			{
@@ -1184,6 +1180,168 @@ function stage1Tap(soundName)
 			}
 		}
 	}
+}
+
+function initS1B()
+{
+	//left hand qwe, right hand on jkl (iop better?)
+	helpText.style.left = "40vw";
+	helpText.style.top = "40vw";
+	helpText.style.transform = "rotate(0deg)";
+
+	// keyboardDiv.style.top = "11vw";
+	// keyboardDiv.style.left = "58vw";
+	scaleAndPosition(keyboardDiv, 15, 25, 1);
+	scaleAndPosition(drumDiv, 50, 15, 0.5);
+	isIntroPartB = true;
+	riffProgress = 0;
+	phaseStart = 0;
+	setTimeout(function()
+	{
+		//tap/click based on isTouchScreen
+		helpText.innerHTML = "Level 2: Keyboard only";
+		// cursorImage.style.width = "5vw";
+		setTimeout(function()
+		{
+			toggleHotkeys();
+			helpText.innerHTML = "Left hand 'Q W E'"; //press Q W E
+			// currentRiff = s1bNotesTrack;
+			// thisPhaseSize = 3;
+			// songProgress = 0;
+			// phasePos = 0;
+			// currentRiff.queueSomeNotes(0, 3, 2000);
+
+
+			clickNumber = 0;
+			notesAndPhases =  [['p1', 'p2', 'p3'], ['p1', 'p2', 'p3'], ['kick', 'hat', 'snare'],
+						['p1', 'p2', 'p3', 'p2', 'p1'], ['kick', 'hat', 'snare' ,'hat', 'kick'],
+						['p1', 'p2', 'p3', 'p2', 'p1'], ['kick', 'hat', 'snare' ,'hat', 'kick']];
+			playPhase(0, 1000);
+			phaseNumber = 0;
+
+		}, 2000);
+	}, 2000);
+}
+
+function stage1bTap(soundName)
+{
+	clickNumber++;
+	//if phase over / == 5, check if simultaneoous notes are within x ms of eachother
+	// before triggering wrong note,
+	// need check if both notes are correct/within time limit
+	if(phaseNumber > 5)
+	{
+		// sameTimeTap(soundName);?
+		// return;?
+		//check lefthand notes against different phase, 
+	}
+	currentNote = notesAndPhases[phaseNumber][clickNumber-1];
+	let currentPhase = notesAndPhases[phaseNumber];
+	let phaseDelay = 1000;
+	let passedCurrentPhase = (clickNumber == currentPhase.length);
+
+	let isCorrectTap = (soundName == currentNote);
+	if(!isCorrectTap && !stageComplete && stage != STUDIO)
+	{
+		//replays last phase for listening
+		wrongNote();//subtracts 1 from clickNumber
+		if(phaseNumber == 5)
+		{
+			playPhase(4, 500);
+		}
+	}
+	else //correct hit
+	{
+		correctTaps++;
+
+
+		// play qwe/wait for player to do same
+		// helpText.innerHTML = "Faster!";
+		// play qwe faster wait for player to do same
+		// helpText.innerHTML = "Left hand 'J K L'";
+		// helpText.innerHTML = "Faster!";
+		// helpText.innerHTML = "Together J+Q";
+		if(passedCurrentPhase)
+		{
+			//advance
+			if(phaseNumber == notesAndPhases.length-1)//stage complete
+			{
+
+			}
+			else
+			{
+				if(phaseNumber == 0)
+				{
+					beatTime = 150;
+					helpText.innerHTML = "Faster!"; //press Q W E
+					phaseDelay = 800;
+				}
+				else if(phaseNumber == 1)
+				{
+					helpText.innerHTML = "Right hand 'J K L'";
+				}
+				else if(phaseNumber == 2)
+				{
+					helpText.innerHTML = "Good!";
+				}
+				else if(phaseNumber == 4)
+				{
+					helpText.innerHTML = "Together!";
+					beatTime = 300;
+					playPhase(4, phaseDelay);
+				}
+				playNextPhase(phaseDelay);
+			}
+		}
+	}
+
+	// riffProgress++;
+	// // currentNote = randomTrack.notes[quickTapCount-1].soundName;
+	// currentNote = currentRiff.notes[riffProgress-1].soundName;
+	// let isCorrectTap = (soundName == currentNote);
+	// if(isCorrectTap)
+	// {
+	// 	if(riffProgress == currentRiff.notes.length)//end off all phases
+	// 	{
+	// 		riffProgress = 0;
+	// 		phasePos = 0;
+	// 		thisPhaseSize = currentRiff.phaseLengths[phasePos];
+	// 		phaseStart = phasePos*thisPhaseSize;
+	// 		helpText.innerHTML = 'Song complete.';
+	// 	}
+	// 	else
+	// 	{
+	// 		if(riffProgress == (phasePos+1)*thisPhaseSize)//end of phase
+	// 		{
+	// 			songProgress += thisPhaseSize;
+	// 			phasePos++;
+	// 			thisPhaseSize = currentRiff.phaseLengths[phasePos];
+	//
+	// 			// phaseStart = phasePos*thisPhaseSize;
+	// 			phaseStart = songProgress;
+	// 			helpText.innerHTML = 'listen';
+	// 			setTimeout(function()
+	// 			{
+	// 				playPhaseAndDisableInput();
+	// 			}, 600);
+	// 		}
+	// 	}
+	//
+	// }
+	// else//wrong note
+	// {
+	// 	clearInterval(scoreTimer);
+	// 	unhighlightPiano();
+	// 	helpText.innerHTML = 'listen';
+	// 	riffProgress = phaseStart;
+	// 	songProgress = phaseStart;
+	// 	setTimeout(function()
+	// 	{
+	// 		// currentRiff.queueAllNotes(0);
+	// 		playPhaseAndDisableInput();
+	// 		// currentRiff.queueSomeNotes(phaseStart, phaseStart+thisPhaseSize, 0);
+	// 	}, 600);
+	// }
 }
 
 let eShape = [0, 2, 2, 1, 0, 0];
